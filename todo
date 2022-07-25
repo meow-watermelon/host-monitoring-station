@@ -1,7 +1,3 @@
-overall:
-
-gauge: loadavg 1,5,15
-
 cpu:
 
 gauge: cpu usage by decoupled categories
@@ -10,6 +6,7 @@ gauge: # of online cpu
 
 os:
 
+gauge: loadavg 1,5,15
 gauge: max # of fd
 gauge: current fd usage
 gauge: # of zombie processes
