@@ -1,0 +1,52 @@
+overall:
+
+gauge: loadavg 1,5,15
+
+cpu:
+
+gauge: cpu usage by decoupled categories
+gauge: cpu frequency per cpu
+gauge: # of online cpu
+
+os:
+
+gauge: max # of fd
+gauge: current fd usage
+gauge: # of zombie processes
+gauge: # of blocked process
+gauge: # of context switches
+
+memory:
+
+gauge: total memory
+gauge: free usage
+gauge: buffer usage
+gauge: cache usage
+gauge: # of minor page faults
+gauge: swap total
+gauge: swap free
+
+disk:
+
+gauge: # of online disk
+gauge: partition space usage
+gauge: partition inode usage
+counter: read per sec by disk
+counter: write per sec by disk
+counter: io queue length per sec
+gauge: per io request spent
+
+network:
+
+counter: bytes sent per sec by interface
+counter: bytes received per sec by interface
+counter: bytes sent dropped per sec by interface
+counter: bytes received dropped per sec by interface
+counter: bytes sent error per sec by interface
+counter: bytes received error per sec by interface
+counter: bytes sent overflow per sec by interface
+counter: bytes received overflow per sec by interface
+
+tcp: [todo]
+
+udp: [todo]
