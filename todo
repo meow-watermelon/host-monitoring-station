@@ -9,9 +9,11 @@ os:
 gauge: loadavg 1,5,15
 gauge: max # of fd
 gauge: current fd usage
+gauge: # of total processes
+gauge: # of running processes
 gauge: # of zombie processes
-gauge: # of blocked process
-gauge: # of context switches
+gauge: # of blocked processes
+counter: # of context switches per sec
 
 memory:
 
