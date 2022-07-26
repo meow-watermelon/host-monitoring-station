@@ -19,9 +19,9 @@ memory:
 
 gauge: total memory
 gauge: free usage
+gauge: available usage
 gauge: buffer usage
 gauge: cache usage
-gauge: # of minor page faults
 gauge: swap total
 gauge: swap free
 
