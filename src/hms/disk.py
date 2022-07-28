@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import collections
 import glob
 import os
 import re
@@ -32,7 +31,6 @@ class Disk():
         ref.: https://www.kernel.org/doc/Documentation/block/stat.txt
         """
         disk = {}
-        metrics = collections.OrderedDict()
         # format: [metric name: metric index on stat]
         metrics = {
             'read_io': 0,
