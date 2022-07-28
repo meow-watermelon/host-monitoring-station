@@ -26,9 +26,9 @@ class OS():
             pass
         else:
             loadavg_values = loadavg_lines[0].strip().split()
-            loadavg['1min'] = loadavg_values[0]
-            loadavg['5min'] = loadavg_values[1]
-            loadavg['15min'] = loadavg_values[2]
+            loadavg['loadavg_1min'] = loadavg_values[0]
+            loadavg['loadavg_5min'] = loadavg_values[1]
+            loadavg['loadavg_15min'] = loadavg_values[2]
 
         return loadavg
 
@@ -118,9 +118,3 @@ class OS():
                     break
 
         return context_switch
-
-os = OS()
-print(os.loadavg)
-print(os.fd)
-print(os.procs)
-print(os.context_switch)

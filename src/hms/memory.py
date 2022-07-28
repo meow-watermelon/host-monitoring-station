@@ -42,6 +42,3 @@ class Memory():
                         break
 
         return memory
-
-memory = Memory()
-print(memory.memory)
