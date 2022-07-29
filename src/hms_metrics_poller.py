@@ -5,7 +5,6 @@ import importlib.util
 import os
 import rrdtool
 import sys
-import yaml
 
 # load host monitoring station module - hms
 spec = importlib.util.spec_from_file_location('hms', f'{os.getcwd()}/hms/__init__.py')
@@ -15,18 +14,7 @@ spec.loader.exec_module(hms)
 
 class Metrics():
     def __init__(self, config_file):
-        self.config = self._read_config(config_file)
-
-    def _read_config(self, config_file):
-        config = {}
-
-        try:
-            with open(config_file, 'rt') as f:
-                config = yaml.load(f, Loader=yaml.FullLoader)
-        except:
-            pass
-
-        return config
+        self.config = hms.utils.read_config(config_file)
 
     def _rrd_update(self, metrics_list, metrics_values, rrd_filename):
         """

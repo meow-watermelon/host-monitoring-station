@@ -2,10 +2,17 @@
 
 import argparse
 import glob
+import importlib
 import os
 import re
 import rrdtool
 import sys
+
+# load host monitoring station module - hms
+spec = importlib.util.spec_from_file_location('hms', f'{os.getcwd()}/hms/__init__.py')
+hms = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = hms
+spec.loader.exec_module(hms)
 
 class Bootstrap():
     def __init__(self, rrd_dir, step):
@@ -25,7 +32,7 @@ class Bootstrap():
             'write_sector': 'COUNTER',
             'in_flight': 'GAUGE',
         }
-        disk_devices = [os.path.basename(dir) for dir in glob.glob('/sys/class/block/*') if not re.match(r'^loop|^zram|^sr', os.path.basename(dir))]
+        disk_devices = hms.utils.get_disk_devices()
 
         for metric, compute in metrics.items():
             rrd_filename = self.rrd_dir + f'/disk-{metric}.rrd'
@@ -45,7 +52,7 @@ class Bootstrap():
         bootstrap network stats information RRD databases
         """
         metrics = ['rx_bytes', 'rx_errors', 'rx_dropped', 'tx_bytes', 'tx_errors', 'tx_dropped', 'collisions']
-        interfaces = [os.path.basename(dir) for dir in glob.glob('/sys/class/net/*')]
+        interfaces = hms.utils.get_network_interfaces()
 
         for metric in metrics:
             rrd_filename = self.rrd_dir + f'/network-{metric}.rrd'

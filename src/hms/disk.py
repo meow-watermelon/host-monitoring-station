@@ -3,10 +3,11 @@
 import glob
 import os
 import re
+from . import utils
 
 class Disk():
     def __init__(self):
-        self.disk_devices = [os.path.basename(dir) for dir in glob.glob('/sys/class/block/*') if not re.match(r'^loop|^zram|^sr', os.path.basename(dir))]
+        self.disk_devices = utils.get_disk_devices()
         self.disk = self._get_disk()
 
     def _read_stats(self, disk_device):

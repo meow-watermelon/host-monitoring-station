@@ -2,10 +2,11 @@
 
 import glob
 import os
+from . import utils
 
 class Network():
     def __init__(self):
-        self.interfaces = [os.path.basename(dir) for dir in glob.glob('/sys/class/net/*')]
+        self.interfaces = utils.get_network_interfaces()
         self.network = self._get_network()
 
     def _read_stats(self, interface, metric):

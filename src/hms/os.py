@@ -14,9 +14,9 @@ class OS():
         get 1min, 5min and 15min load average values
         """
         loadavg = {
-            '1min': None,
-            '5min': None,
-            '15min': None,
+            'loadavg_1min': None,
+            'loadavg_5min': None,
+            'loadavg_15min': None,
         }
 
         try:

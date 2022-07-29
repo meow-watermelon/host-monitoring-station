@@ -6,3 +6,4 @@ from . import disk
 from . import memory
 from . import network
 from . import os
+from . import utils
