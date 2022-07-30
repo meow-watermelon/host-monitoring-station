@@ -34,10 +34,9 @@ class OS():
 
     def _get_fd(self):
         """
-        get allocated number of fds and maximum number of fds values
+        get allocated number of fds
         """
         fd = {
-            'num_max_fd': None,
             'num_used_fd': None,
         }
 
@@ -49,7 +48,6 @@ class OS():
         else:
             fd_values = fd_lines[0].strip().split()
             fd['num_used_fd'] = fd_values[0]
-            fd['num_max_fd'] = fd_values[2]
 
         return fd
 
@@ -92,7 +90,7 @@ class OS():
                     if line.startswith('Z'):
                         zombie_count += 1
 
-                procs['num_zombie_procs'] = zombie_count
+                procs['num_zombie_procs'] = str(zombie_count)
             else:
                 pass
 

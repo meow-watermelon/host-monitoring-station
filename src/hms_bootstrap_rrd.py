@@ -100,7 +100,6 @@ class Bootstrap():
             'DS:loadavg_1min:GAUGE:300:0:U',
             'DS:loadavg_5min:GAUGE:300:0:U',
             'DS:loadavg_15min:GAUGE:300:0:U',
-            'DS:num_max_fd:GAUGE:300:0:U',
             'DS:num_used_fd:GAUGE:300:0:U',
             'DS:num_total_procs:GAUGE:300:0:U',
             'DS:num_running_procs:GAUGE:300:0:U',
