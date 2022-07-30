@@ -58,6 +58,8 @@ class Metrics():
             for disk_device in disk_devices:
                 metric_values.append(disk[metric][disk_device])
             print(metric, metric_values)
+
+            # update RRD database
             self._rrd_update(disk_devices, metric_values, rrd_filename)
 
     def poll_memory_metrics(self):
@@ -99,6 +101,8 @@ class Metrics():
             for interface in interfaces:
                 metric_values.append(network[metric][interface])
             print(metric, metric_values)
+
+            # update RRD database
             self._rrd_update(interfaces, metric_values, rrd_filename)
 
     def poll_os_metrics(self):
