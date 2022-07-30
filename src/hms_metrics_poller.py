@@ -26,11 +26,11 @@ class Metrics():
         # metrics_values_bucket is used for generating final metrics string
         metrics_values_bucket = []
 
-        for metric in metrics_list:
-            if metrics_values[metric] is None:
+        for metric in metrics_values:
+            if metric is None:
                 metrics_values_bucket.append('U')
             else:
-                metrics_values_bucket.append(str(metrics_values[metric]))
+                metrics_values_bucket.append(str(metric))
 
         metrics_values_string = ':'.join(metrics_values_bucket)
         rrdtool.update(
@@ -54,7 +54,11 @@ class Metrics():
         # update RRD databases
         for metric in metrics:
             rrd_filename = self.config['RRD_DB_PATH'] + f'/disk-{metric}.rrd'
-            self._rrd_update(disk_devices, disk[metric], rrd_filename)
+            metric_values = []
+            for disk_device in disk_devices:
+                metric_values.append(disk[metric][disk_device])
+            print(metric, metric_values)
+            self._rrd_update(disk_devices, metric_values, rrd_filename)
 
     def poll_memory_metrics(self):
         """
@@ -66,9 +70,15 @@ class Metrics():
 
         # populate metrics
         memory = hms.memory.Memory().memory
+        metric_values = []
+
+        for metric in metrics:
+            metric_values.append(memory[metric])
+
+        print(metric_values)
 
         # update RRD database
-        self._rrd_update(metrics, memory, rrd_filename)
+        self._rrd_update(metrics, metric_values, rrd_filename)
 
     def poll_network_metrics(self):
         """
@@ -85,7 +95,11 @@ class Metrics():
         # update RRD databases
         for metric in metrics:
             rrd_filename = self.config['RRD_DB_PATH'] + f'/network-{metric}.rrd'
-            self._rrd_update(interfaces, network[metric], rrd_filename)
+            metric_values = []
+            for interface in interfaces:
+                metric_values.append(network[metric][interface])
+            print(metric, metric_values)
+            self._rrd_update(interfaces, metric_values, rrd_filename)
 
     def poll_os_metrics(self):
         """
@@ -93,9 +107,10 @@ class Metrics():
         """
         # initialize environment variables
         loadavg_metrics = ['loadavg_1min', 'loadavg_5min', 'loadavg_15min']
-        fd_metrics = ['num_max_fd', 'num_used_fd']
+        fd_metrics = ['num_used_fd']
         procs_metrics = ['num_total_procs', 'num_running_procs', 'num_blocked_procs', 'num_zombie_procs']
         context_switch_metrics = ['num_context_switch']
+        metrics = loadavg_metrics + fd_metrics + procs_metrics + context_switch_metrics
         rrd_filename = self.config['RRD_DB_PATH'] + '/os.rrd'
 
         # populate metrics
@@ -103,12 +118,21 @@ class Metrics():
         fd = hms.os.OS().fd
         procs = hms.os.OS().procs
         context_switch = hms.os.OS().context_switch
+        metric_values = []
+
+        for metric in loadavg_metrics:
+            metric_values.append(loadavg[metric])
+        for metric in fd_metrics:
+            metric_values.append(fd[metric])
+        for metric in procs_metrics:
+            metric_values.append(procs[metric])
+        for metric in context_switch_metrics:
+            metric_values.append(context_switch[metric])
+
+        print(metric_values)
 
         # update RRD database
-        self._rrd_update(loadavg_metrics, loadavg, rrd_filename)
-        self._rrd_update(fd_metrics, fd, rrd_filename)
-        self._rrd_update(procs_metrics, procs, rrd_filename)
-        self._rrd_update(context_switch_metrics, context_switch, rrd_filename)
+        self._rrd_update(metrics, metric_values, rrd_filename)
 
 if __name__ == '__main__':
     # set up args
