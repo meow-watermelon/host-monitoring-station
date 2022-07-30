@@ -7,12 +7,13 @@ import rrdtool
 import sys
 
 # load host monitoring station module - hms
-spec = importlib.util.spec_from_file_location('hms', f'{os.getcwd()}/hms/__init__.py')
+spec = importlib.util.spec_from_file_location("hms", f"{os.getcwd()}/hms/__init__.py")
 hms = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = hms
 spec.loader.exec_module(hms)
 
-class Metrics():
+
+class Metrics:
     def __init__(self, config_file):
         self.config = hms.utils.read_config(config_file)
 
@@ -21,22 +22,23 @@ class Metrics():
         update RRD database wrapper
         """
         # generating data source string
-        rrd_ds = ':'.join(metrics_list)
+        rrd_ds = ":".join(metrics_list)
 
         # metrics_values_bucket is used for generating final metrics string
         metrics_values_bucket = []
 
         for metric in metrics_values:
             if metric is None:
-                metrics_values_bucket.append('U')
+                metrics_values_bucket.append("U")
             else:
                 metrics_values_bucket.append(str(metric))
 
-        metrics_values_string = ':'.join(metrics_values_bucket)
+        metrics_values_string = ":".join(metrics_values_bucket)
         rrdtool.update(
             rrd_filename,
-            '--template', rrd_ds,
-            f'N:{metrics_values_string}',
+            "--template",
+            rrd_ds,
+            f"N:{metrics_values_string}",
         )
 
     def poll_disk_metrics(self):
@@ -44,8 +46,16 @@ class Metrics():
         populate disk devices stats information and write to disk RRD databases
         """
         # initialize environment variables
-        metrics = ['read_io', 'read_merge', 'read_sector', 'write_io', 'write_merge', 'write_sector', 'in_flight']
-        
+        metrics = [
+            "read_io",
+            "read_merge",
+            "read_sector",
+            "write_io",
+            "write_merge",
+            "write_sector",
+            "in_flight",
+        ]
+
         # populate metrics
         disk_obj = hms.disk.Disk()
         disk_devices = disk_obj.disk_devices
@@ -53,7 +63,7 @@ class Metrics():
 
         # update RRD databases
         for metric in metrics:
-            rrd_filename = self.config['RRD_DB_PATH'] + f'/disk-{metric}.rrd'
+            rrd_filename = self.config["RRD_DB_PATH"] + f"/disk-{metric}.rrd"
             metric_values = []
             for disk_device in disk_devices:
                 metric_values.append(disk[metric][disk_device])
@@ -67,8 +77,16 @@ class Metrics():
         populate memory information and write to memory RRD databases
         """
         # initialize environment variables
-        metrics = ['memory_total', 'memory_free', 'memory_avail', 'buffer', 'cache', 'swap_total', 'swap_free']
-        rrd_filename = self.config['RRD_DB_PATH'] + '/memory.rrd'
+        metrics = [
+            "memory_total",
+            "memory_free",
+            "memory_avail",
+            "buffer",
+            "cache",
+            "swap_total",
+            "swap_free",
+        ]
+        rrd_filename = self.config["RRD_DB_PATH"] + "/memory.rrd"
 
         # populate metrics
         memory = hms.memory.Memory().memory
@@ -87,8 +105,16 @@ class Metrics():
         populate network interface stats information and write to network RRD databases
         """
         # initialize environment variables
-        metrics = ['rx_bytes', 'rx_errors', 'rx_dropped', 'tx_bytes', 'tx_errors', 'tx_dropped', 'collisions']
-        
+        metrics = [
+            "rx_bytes",
+            "rx_errors",
+            "rx_dropped",
+            "tx_bytes",
+            "tx_errors",
+            "tx_dropped",
+            "collisions",
+        ]
+
         # populate metrics
         network_obj = hms.network.Network()
         interfaces = network_obj.interfaces
@@ -96,7 +122,7 @@ class Metrics():
 
         # update RRD databases
         for metric in metrics:
-            rrd_filename = self.config['RRD_DB_PATH'] + f'/network-{metric}.rrd'
+            rrd_filename = self.config["RRD_DB_PATH"] + f"/network-{metric}.rrd"
             metric_values = []
             for interface in interfaces:
                 metric_values.append(network[metric][interface])
@@ -110,12 +136,17 @@ class Metrics():
         populate OS information and write to OS RRD database
         """
         # initialize environment variables
-        loadavg_metrics = ['loadavg_1min', 'loadavg_5min', 'loadavg_15min']
-        fd_metrics = ['num_used_fd']
-        procs_metrics = ['num_total_procs', 'num_running_procs', 'num_blocked_procs', 'num_zombie_procs']
-        context_switch_metrics = ['num_context_switch']
+        loadavg_metrics = ["loadavg_1min", "loadavg_5min", "loadavg_15min"]
+        fd_metrics = ["num_used_fd"]
+        procs_metrics = [
+            "num_total_procs",
+            "num_running_procs",
+            "num_blocked_procs",
+            "num_zombie_procs",
+        ]
+        context_switch_metrics = ["num_context_switch"]
         metrics = loadavg_metrics + fd_metrics + procs_metrics + context_switch_metrics
-        rrd_filename = self.config['RRD_DB_PATH'] + '/os.rrd'
+        rrd_filename = self.config["RRD_DB_PATH"] + "/os.rrd"
 
         # populate metrics
         loadavg = hms.os.OS().loadavg
@@ -138,10 +169,15 @@ class Metrics():
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # set up args
-    parser = argparse.ArgumentParser(description='Host Monitoring Station Metrics Poller')
-    parser.add_argument('--config', type=str, required=True, help='Host Monitoring Station config file')
+    parser = argparse.ArgumentParser(
+        description="Host Monitoring Station Metrics Poller"
+    )
+    parser.add_argument(
+        "--config", type=str, required=True, help="Host Monitoring Station config file"
+    )
     args = parser.parse_args()
 
     # create metrics object

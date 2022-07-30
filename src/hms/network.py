@@ -4,7 +4,8 @@ import glob
 import os
 from . import utils
 
-class Network():
+
+class Network:
     def __init__(self):
         self.interfaces = utils.get_network_interfaces()
         self.network = self._get_network()
@@ -16,7 +17,7 @@ class Network():
         value = None
 
         try:
-            with open(f'/sys/class/net/{interface}/statistics/{metric}', 'rt') as f:
+            with open(f"/sys/class/net/{interface}/statistics/{metric}", "rt") as f:
                 metric_lines = f.readlines()
         except:
             pass
@@ -31,7 +32,15 @@ class Network():
         ref.: https://docs.kernel.org/networking/statistics.html
         """
         network = {}
-        metrics = ['rx_bytes', 'rx_errors', 'rx_dropped', 'tx_bytes', 'tx_errors', 'tx_dropped', 'collisions']
+        metrics = [
+            "rx_bytes",
+            "rx_errors",
+            "rx_dropped",
+            "tx_bytes",
+            "tx_errors",
+            "tx_dropped",
+            "collisions",
+        ]
 
         for metric in metrics:
             for interface in self.interfaces:

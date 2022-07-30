@@ -5,7 +5,8 @@ import os
 import re
 from . import utils
 
-class Disk():
+
+class Disk:
     def __init__(self):
         self.disk_devices = utils.get_disk_devices()
         self.disk = self._get_disk()
@@ -24,7 +25,7 @@ class Disk():
         values = []
 
         try:
-            with open(f'/sys/class/block/{disk_device}/stat', 'rt') as f:
+            with open(f"/sys/class/block/{disk_device}/stat", "rt") as f:
                 metric_lines = f.readlines()
         except:
             pass
@@ -41,13 +42,13 @@ class Disk():
         disk = {}
         # format: [metric name: metric index on stat]
         metrics = {
-            'read_io': 0,
-            'read_merge': 1,
-            'read_sector': 2,
-            'write_io': 4,
-            'write_merge': 5,
-            'write_sector': 6,
-            'in_flight': 8,
+            "read_io": 0,
+            "read_merge": 1,
+            "read_sector": 2,
+            "write_io": 4,
+            "write_merge": 5,
+            "write_sector": 6,
+            "in_flight": 8,
         }
 
         for metric, index in metrics.items():

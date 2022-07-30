@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-class Memory():
+
+class Memory:
     def __init__(self):
         self.memory = self._get_memory()
 
@@ -10,27 +11,27 @@ class Memory():
         unit: kB
         """
         memory = {
-            'memory_total': None,
-            'memory_free': None,
-            'memory_avail': None,
-            'buffer': None,
-            'cache': None,
-            'swap_total': None,
-            'swap_free': None,
+            "memory_total": None,
+            "memory_free": None,
+            "memory_avail": None,
+            "buffer": None,
+            "cache": None,
+            "swap_total": None,
+            "swap_free": None,
         }
 
         memory_metrics_mapping = {
-            'memory_total': 'MemTotal',
-            'memory_free': 'MemFree',
-            'memory_avail': 'MemAvailable',
-            'buffer': 'Buffer',
-            'cache': 'Cached',
-            'swap_total': 'SwapTotal',
-            'swap_free': 'SwapFree',
+            "memory_total": "MemTotal",
+            "memory_free": "MemFree",
+            "memory_avail": "MemAvailable",
+            "buffer": "Buffer",
+            "cache": "Cached",
+            "swap_total": "SwapTotal",
+            "swap_free": "SwapFree",
         }
 
         try:
-            with open('/proc/meminfo', 'rt') as f:
+            with open("/proc/meminfo", "rt") as f:
                 memory_lines = f.readlines()
         except:
             pass
