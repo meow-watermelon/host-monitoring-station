@@ -13,6 +13,13 @@ class Disk():
     def _read_stats(self, disk_device):
         """
         a function to read metric values into a list from a specific file
+        ref.: https://www.kernel.org/doc/Documentation/block/queue-sysfs.txt
+
+        it's possible that iostats is not enabled on the device so all values in stat would be zero
+
+        to enable iostats:
+
+        # echo 1 > /sys/block/<disk_device>/queue/iostats
         """
         values = []
 
