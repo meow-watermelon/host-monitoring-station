@@ -163,7 +163,7 @@ class Graph:
         memory = collections.OrderedDict()
         memory = {
             "memory_total": {
-                "color": "#808080",
+                "color": "#00FF7F",
                 "legend": "Total Memory",
                 "style": "AREA",
             },
@@ -228,7 +228,7 @@ class Graph:
         swap = collections.OrderedDict()
         swap = {
             "swap_total": {
-                "color": "#808080",
+                "color": "#00FF7F",
                 "legend": "Total Swap",
                 "style": "AREA",
             },
@@ -529,7 +529,7 @@ class Graph:
                 "rrd_filename": self.rrd_db_dir + "/network-tx_dropped.rrd",
                 "graph_title": "Number of Packets Dropped In Transmission (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + "/network-rx_dropped.png",
+                "graph_filename": self.rrd_graph_dir + "/network-tx_dropped.png",
             },
             "collisions": {
                 "rrd_filename": self.rrd_db_dir + "/network-collisions.rrd",
