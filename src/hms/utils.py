@@ -8,10 +8,16 @@ import yaml
 
 
 def get_network_interfaces():
+    """
+    get network interface list
+    """
     return [os.path.basename(dir) for dir in glob.glob("/sys/class/net/*")]
 
 
 def get_disk_devices():
+    """
+    get disk device list
+    """
     return [
         os.path.basename(dir)
         for dir in glob.glob("/sys/class/block/*")
@@ -20,6 +26,9 @@ def get_disk_devices():
 
 
 def get_rrd_ds(rrd_filename):
+    """
+    get data source list from RRD database. used for populating dynamic generating data sources
+    """
     ds = []
 
     rrd_info = rrdtool.info(rrd_filename)
@@ -34,6 +43,9 @@ def get_rrd_ds(rrd_filename):
 
 
 def rotate_color_plate(items, color_plate):
+    """
+    build color plate list for dynamic generating legends
+    """
     final_color_plate = []
 
     rotate_count, extra_color_count = divmod(len(items), len(color_plate))
@@ -43,6 +55,9 @@ def rotate_color_plate(items, color_plate):
 
 
 def read_config(config_file):
+    """
+    read YAML format configuration file
+    """
     config = {}
 
     try:
