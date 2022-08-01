@@ -1,3 +1,0 @@
-RRD_DB_PATH: '/home/ericlee/Projects/hms/rrd'
-RRD_GRAPH_PATH: '/home/ericlee/Projects/hms/graphs'
-HMS_LOG_PATH: '/home/ericlee/Projects/hms/logs'

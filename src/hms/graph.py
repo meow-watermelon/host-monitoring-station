@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
 import collections
+import os
 import rrdtool
 from . import utils
 
 
 class Graph:
-    def __init__(self, rrd_db_dir, rrd_graph_dir, size, start, end):
+    def __init__(self, rrd_db_dir, rrd_graph_dir, size, start, end, uuid):
         self.rrd_db_dir = rrd_db_dir
         self.rrd_graph_dir = rrd_graph_dir
         self.rrd_graph_format = "PNG"
         self.size = self._set_size(size)
         self.start = start
         self.end = end
+        self.uuid = uuid
         self.color_plate = [
             "#191970",
             "#FF0000",
@@ -47,49 +49,52 @@ class Graph:
         """
         plot disk RRD graphs
         """
+        # disk graph filename mappings
+        disk_graph_filename = {}
+
         # set up graph attributes
         disk_metric_mappings = {
             "read_io": {
                 "rrd_filename": self.rrd_db_dir + "/disk-read_io.rrd",
                 "graph_title": "Number of Read I/Os (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-read_io.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-read_io.{self.uuid}.png",
             },
             "read_merge": {
                 "rrd_filename": self.rrd_db_dir + "/disk-read_merge.rrd",
                 "graph_title": "Number of Read I/Os Merged (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-read_merge.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-read_merge.{self.uuid}.png",
             },
             "read_sector": {
                 "rrd_filename": self.rrd_db_dir + "/disk-read_sector.rrd",
                 "graph_title": "Number of Sectors Read (per second)",
                 "graph_vertical_label": "sector/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-read_sector.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-read_sector.{self.uuid}.png",
             },
             "write_io": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_io.rrd",
                 "graph_title": "Number of Write I/Os (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-write_io.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-write_io.{self.uuid}.png",
             },
             "write_merge": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_merge.rrd",
                 "graph_title": "Number of Write I/Os Merged (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-write_merge.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-write_merge.{self.uuid}.png",
             },
             "write_sector": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_sector.rrd",
                 "graph_title": "Number of Sectors Written (per second)",
                 "graph_vertical_label": "sector/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-write_sector.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-write_sector.{self.uuid}.png",
             },
             "in_flight": {
                 "rrd_filename": self.rrd_db_dir + "/disk-in_flight.rrd",
                 "graph_title": "Number of I/Os In Flight (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/disk-in_flight.png",
+                "graph_filename": self.rrd_graph_dir + f"/disk-in_flight.{self.uuid}.png",
             },
         }
 
@@ -126,10 +131,10 @@ class Graph:
                     f"DEF:{disk_device}={rrd_filename}:{disk_device}:LAST"
                 )
                 disk_graph_commands.append(f"{style}:{disk_device}{color}:{legend}")
-                disk_graph_commands.append(f"GPRINT:{disk_device}:MAX:max\: %8.1lf")
-                disk_graph_commands.append(f"GPRINT:{disk_device}:MIN:min\: %8.1lf")
+                disk_graph_commands.append(f"GPRINT:{disk_device}:MAX:max\: %10.1lf")
+                disk_graph_commands.append(f"GPRINT:{disk_device}:MIN:min\: %10.1lf")
                 disk_graph_commands.append(
-                    f"GPRINT:{disk_device}:LAST:last\: %8.1lf \j"
+                    f"GPRINT:{disk_device}:LAST:last\: %10.1lf \j"
                 )
 
             # generate graph
@@ -152,12 +157,20 @@ class Graph:
                 disk_graph_commands,
             )
 
+            # populate graph filenames
+            disk_graph_filename[metric] = os.path.basename(graph_filename)
+
+        return disk_graph_filename
+
     def plot_memory_graph(self):
         """
         plot memory RRD graphs
         """
         # set up RRD DB filename
         rrd_filename = self.rrd_db_dir + "/memory.rrd"
+
+        # memory graph filename mappings
+        memory_swap_graph_filename = {}
 
         # plot memory graphs
         memory = collections.OrderedDict()
@@ -192,7 +205,7 @@ class Graph:
         # set up graph attributes
         memory_graph_title = "Memory Usage (kB)"
         memory_graph_vertical_label = "kB"
-        memory_graph_filename = self.rrd_graph_dir + "/memory-memory.png"
+        memory_graph_filename = self.rrd_graph_dir + f"/memory-memory.{self.uuid}.png"
         memory_graph_commands = []
         for metric, meta in memory.items():
             color = meta["color"]
@@ -242,7 +255,7 @@ class Graph:
         # set up graph attributes
         swap_graph_title = "Swap Usage (kB)"
         swap_graph_vertical_label = "kB"
-        swap_graph_filename = self.rrd_graph_dir + "/memory-swap.png"
+        swap_graph_filename = self.rrd_graph_dir + f"/memory-swap.{self.uuid}.png"
         swap_graph_commands = []
         for metric, meta in swap.items():
             color = meta["color"]
@@ -274,12 +287,21 @@ class Graph:
             swap_graph_commands,
         )
 
+        # populate graph filenames
+        memory_swap_graph_filename['memory'] = os.path.basename(memory_graph_filename)
+        memory_swap_graph_filename['swap'] = os.path.basename(swap_graph_filename)
+
+        return memory_swap_graph_filename
+
     def plot_os_graph(self):
         """
         plot OS RRD graphs
         """
         # set up RRD DB filename
         rrd_filename = self.rrd_db_dir + "/os.rrd"
+
+        # OS graph filename mappings
+        os_graph_filename = {}
 
         # plot loadavg graph
         loadavg = collections.OrderedDict()
@@ -303,7 +325,7 @@ class Graph:
 
         # set up graph attributes
         loadavg_graph_title = "Load Average 1min/5min/15min"
-        loadavg_graph_filename = self.rrd_graph_dir + "/os-loadavg.png"
+        loadavg_graph_filename = self.rrd_graph_dir + f"/os-loadavg.{self.uuid}.png"
         loadavg_graph_commands = []
         for metric, meta in loadavg.items():
             color = meta["color"]
@@ -348,7 +370,7 @@ class Graph:
         # set up graph attributes
         fd_graph_title = "File Descriptors Usage"
         fd_graph_vertical_label = "count"
-        fd_graph_filename = self.rrd_graph_dir + "/os-fd.png"
+        fd_graph_filename = self.rrd_graph_dir + f"/os-fd.{self.uuid}.png"
         fd_graph_commands = []
         for metric, meta in fd.items():
             color = meta["color"]
@@ -408,7 +430,7 @@ class Graph:
         # set up graph attributes
         procs_graph_title = "Processes States"
         procs_graph_vertical_count = "count"
-        procs_graph_filename = self.rrd_graph_dir + "/os-procs.png"
+        procs_graph_filename = self.rrd_graph_dir + f"/os-procs.{self.uuid}.png"
         procs_graph_commands = []
         for metric, meta in procs.items():
             color = meta["color"]
@@ -453,7 +475,7 @@ class Graph:
         # set up graph attributes
         context_switch_graph_title = "Context Switches States (per second)"
         context_switch_graph_vertical_label = "count/second"
-        context_switch_graph_filename = self.rrd_graph_dir + "/os-context_switch.png"
+        context_switch_graph_filename = self.rrd_graph_dir + f"/os-context_switch.{self.uuid}.png"
         context_switch_graph_commands = []
         for metric, meta in context_switch.items():
             color = meta["color"]
@@ -463,10 +485,10 @@ class Graph:
                 f"DEF:{metric}={rrd_filename}:{metric}:LAST"
             )
             context_switch_graph_commands.append(f"{style}:{metric}{color}:{legend}")
-            context_switch_graph_commands.append(f"GPRINT:{metric}:MAX:max\: %20.1lf")
-            context_switch_graph_commands.append(f"GPRINT:{metric}:MIN:min\: %20.1lf")
+            context_switch_graph_commands.append(f"GPRINT:{metric}:MAX:max\: %12.1lf")
+            context_switch_graph_commands.append(f"GPRINT:{metric}:MIN:min\: %12.1lf")
             context_switch_graph_commands.append(
-                f"GPRINT:{metric}:LAST:last\: %20.1lf \j"
+                f"GPRINT:{metric}:LAST:last\: %12.1lf \j"
             )
 
         # generate graph
@@ -489,53 +511,64 @@ class Graph:
             context_switch_graph_commands,
         )
 
+        # populate graph filenames
+        os_graph_filename['loadavg'] = os.path.basename(loadavg_graph_filename)
+        os_graph_filename['fd'] = os.path.basename(fd_graph_filename)
+        os_graph_filename['procs'] = os.path.basename(procs_graph_filename)
+        os_graph_filename['context_switch'] = os.path.basename(context_switch_graph_filename)
+
+        return os_graph_filename
+
     def plot_network_graph(self):
         """
         plot network RRD graphs
         """
+        # network graph filename mappings
+        network_graph_filename = {}
+
         # set up graph attributes
         network_metric_mappings = {
             "rx_bytes": {
                 "rrd_filename": self.rrd_db_dir + "/network-rx_bytes.rrd",
                 "graph_title": "Number of Good Received Bytes (per second)",
                 "graph_vertical_label": "byte/second",
-                "graph_filename": self.rrd_graph_dir + "/network-rx_bytes.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-rx_bytes.{self.uuid}.png",
             },
             "rx_errors": {
                 "rrd_filename": self.rrd_db_dir + "/network-rx_errors.rrd",
                 "graph_title": "Number of Bad Packets Received (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + "/network-rx_errors.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-rx_errors.{self.uuid}.png",
             },
             "rx_dropped": {
                 "rrd_filename": self.rrd_db_dir + "/network-rx_dropped.rrd",
                 "graph_title": "Number of Packets Received But Dropped (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + "/network-rx_dropped.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-rx_dropped.{self.uuid}.png",
             },
             "tx_bytes": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_bytes.rrd",
                 "graph_title": "Number of Good Transmitted Bytes (per second)",
                 "graph_vertical_label": "byte/second",
-                "graph_filename": self.rrd_graph_dir + "/network-tx_bytes.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-tx_bytes.{self.uuid}.png",
             },
             "tx_errors": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_errors.rrd",
                 "graph_title": "Number of Bad Packets Transmitted (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + "/network-tx_errors.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-tx_errors.{self.uuid}.png",
             },
             "tx_dropped": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_dropped.rrd",
                 "graph_title": "Number of Packets Dropped In Transmission (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + "/network-tx_dropped.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-tx_dropped.{self.uuid}.png",
             },
             "collisions": {
                 "rrd_filename": self.rrd_db_dir + "/network-collisions.rrd",
                 "graph_title": "Number of Collisions (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + "/network-collisions.png",
+                "graph_filename": self.rrd_graph_dir + f"/network-collisions.{self.uuid}.png",
             },
         }
 
@@ -574,10 +607,10 @@ class Graph:
                     f"DEF:{interface}={rrd_filename}:{interface}:LAST"
                 )
                 network_graph_commands.append(f"{style}:{interface}{color}:{legend}")
-                network_graph_commands.append(f"GPRINT:{interface}:MAX:max\: %8.1lf")
-                network_graph_commands.append(f"GPRINT:{interface}:MIN:min\: %8.1lf")
+                network_graph_commands.append(f"GPRINT:{interface}:MAX:max\: %10.1lf")
+                network_graph_commands.append(f"GPRINT:{interface}:MIN:min\: %10.1lf")
                 network_graph_commands.append(
-                    f"GPRINT:{interface}:LAST:last\: %8.1lf \j"
+                    f"GPRINT:{interface}:LAST:last\: %10.1lf \j"
                 )
 
             # generate graph
@@ -599,3 +632,8 @@ class Graph:
                 graph_vertical_label,
                 network_graph_commands,
             )
+
+            # populate graph filenames
+            network_graph_filename[metric] = os.path.basename(graph_filename)
+
+        return network_graph_filename

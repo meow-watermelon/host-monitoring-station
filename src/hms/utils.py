@@ -4,8 +4,15 @@ import glob
 import os
 import re
 import rrdtool
+import socket
 import yaml
 
+
+def get_hostname_fqdn():
+    """
+    get local hostname FQDN
+    """
+    return socket.getfqdn()
 
 def get_network_interfaces():
     """
