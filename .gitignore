@@ -1,2 +1,3 @@
 src/hms/__pycache__
+src/static/rrd_graph/*.png
 src/generate_graph.py
