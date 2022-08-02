@@ -6,7 +6,6 @@ import sys
 import uuid
 from flask import Flask, render_template, request, g
 from markupsafe import escape
-from werkzeug.serving import WSGIRequestHandler
 
 # load host monitoring station module - hms
 spec = importlib.util.spec_from_file_location("hms", f"{os.getcwd()}/hms/__init__.py")
@@ -33,7 +32,12 @@ def hms_load_graphs():
 
     # construct graph object
     hms_graph = hms.graph.Graph(
-        g.config["RRD_DB_PATH"], "static/rrd_graph", size, start, end, g.uuid
+        g.config["RRD_DB_PATH"],
+        "static/rrd_graph",
+        str(escape(size)),
+        str(escape(start)),
+        str(escape(end)),
+        g.uuid,
     )
 
     # plot graphs and retrieve graph filename mappings
