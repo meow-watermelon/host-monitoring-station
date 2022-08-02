@@ -67,7 +67,6 @@ class Metrics:
             metric_values = []
             for disk_device in disk_devices:
                 metric_values.append(disk[metric][disk_device])
-            print(metric, metric_values)
 
             # update RRD database
             self._rrd_update(disk_devices, metric_values, rrd_filename)
@@ -94,8 +93,6 @@ class Metrics:
 
         for metric in metrics:
             metric_values.append(memory[metric])
-
-        print(metric_values)
 
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
@@ -126,7 +123,6 @@ class Metrics:
             metric_values = []
             for interface in interfaces:
                 metric_values.append(network[metric][interface])
-            print(metric, metric_values)
 
             # update RRD database
             self._rrd_update(interfaces, metric_values, rrd_filename)
@@ -163,8 +159,6 @@ class Metrics:
             metric_values.append(procs[metric])
         for metric in context_switch_metrics:
             metric_values.append(context_switch[metric])
-
-        print(metric_values)
 
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
