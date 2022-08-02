@@ -100,6 +100,7 @@ options:
   --step STEP  RRD database step (default: 1m)
 ```
 The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable for a local monitoring system.
+
 4. Set up the system metrics poller. The poller completes collecting metrics and writing values to RRD databases in a running cycle. Usage:
 ```
 $ ./hms_metrics_poller.py -h
