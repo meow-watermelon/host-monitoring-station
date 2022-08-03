@@ -74,6 +74,7 @@ importlib.util
 markupsafe
 rrdtool
 uWSGI + python3 plugin[optional]
+yaml
 ```
 
 ## Installation and Configuration
