@@ -2,7 +2,6 @@
 
 import importlib.util
 import os
-import rrdtool
 import sys
 import uuid
 from flask import Flask, render_template, request, g
@@ -24,28 +23,12 @@ def hms_load_graphs():
     end = request.args.get("end")
     size = request.args.get("size")
 
-    # retrieve the default start / end time and graph size
-    default_start = g.config["RRD_GRAPH_DEFAULT_START"]
-    default_end = g.config["RRD_GRAPH_DEFAULT_END"]
-    default_size = g.config["RRD_GRAPH_DEFAULT_SIZE"]
-
     if not start:
-        start = default_start
+        start = "end-8h"
     if not end:
-        end = default_end
+        end = "now"
     if not size:
-        size = default_size
-
-    # issue#1
-    # apply default start / end time if the range is not valid
-    try:
-        rrdtool.graph(
-            "--start", start,
-            "--end", end,
-        )
-    except rrdtool.OperationalError:
-        start = default_start
-        end = default_end
+        size = "medium"
 
     # construct graph object
     hms_graph = hms.graph.Graph(

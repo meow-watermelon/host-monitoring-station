@@ -1,5 +1,2 @@
-RRD_DB_PATH: "/home/ericlee/Projects/hms/rrd"
-HMS_LOG_PATH: "/home/ericlee/Projects/hms/logs"
-RRD_GRAPH_DEFAULT_START: "end-8h"
-RRD_GRAPH_DEFAULT_END: "now"
-RRD_GRAPH_DEFAULT_SIZE: "medium"
+RRD_DB_PATH: '/home/ericlee/Projects/hms/rrd'
+HMS_LOG_PATH: '/home/ericlee/Projects/hms/logs'
