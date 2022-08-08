@@ -44,7 +44,11 @@ class CPU:
                     cpu[metric] = {}
 
                 if metric == "cpu_freq":
-                    cpu_freq_metric_file = f"/sys/devices/system/cpu/{cpu_name}/cpufreq/scaling_cur_freq"
-                    cpu[metric][cpu_name] = self._read_stats(cpu_freq_metric_file, cpu_name)
+                    cpu_freq_metric_file = (
+                        f"/sys/devices/system/cpu/{cpu_name}/cpufreq/scaling_cur_freq"
+                    )
+                    cpu[metric][cpu_name] = self._read_stats(
+                        cpu_freq_metric_file, cpu_name
+                    )
 
         return cpu

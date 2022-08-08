@@ -97,9 +97,7 @@ class Graph:
                 cpu_graph_commands.append(f"{style}:{cpu_name}{color}:{legend}")
                 cpu_graph_commands.append(f"GPRINT:{cpu_name}:MAX:max\: %10.1lf")
                 cpu_graph_commands.append(f"GPRINT:{cpu_name}:MIN:min\: %10.1lf")
-                cpu_graph_commands.append(
-                    f"GPRINT:{cpu_name}:LAST:last\: %10.1lf \j"
-                )
+                cpu_graph_commands.append(f"GPRINT:{cpu_name}:LAST:last\: %10.1lf \j")
 
             # generate graph
             rrdtool.graph(
@@ -145,37 +143,43 @@ class Graph:
                 "rrd_filename": self.rrd_db_dir + "/disk-read_merge.rrd",
                 "graph_title": "Number of Read I/Os Merged (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-read_merge.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-read_merge.{self.uuid}.png",
             },
             "read_sector": {
                 "rrd_filename": self.rrd_db_dir + "/disk-read_sector.rrd",
                 "graph_title": "Number of Sectors Read (per second)",
                 "graph_vertical_label": "sector/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-read_sector.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-read_sector.{self.uuid}.png",
             },
             "write_io": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_io.rrd",
                 "graph_title": "Number of Write I/Os (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-write_io.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-write_io.{self.uuid}.png",
             },
             "write_merge": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_merge.rrd",
                 "graph_title": "Number of Write I/Os Merged (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-write_merge.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-write_merge.{self.uuid}.png",
             },
             "write_sector": {
                 "rrd_filename": self.rrd_db_dir + "/disk-write_sector.rrd",
                 "graph_title": "Number of Sectors Written (per second)",
                 "graph_vertical_label": "sector/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-write_sector.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-write_sector.{self.uuid}.png",
             },
             "in_flight": {
                 "rrd_filename": self.rrd_db_dir + "/disk-in_flight.rrd",
                 "graph_title": "Number of I/Os In Flight (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + f"/disk-in_flight.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/disk-in_flight.{self.uuid}.png",
             },
         }
 
@@ -369,8 +373,8 @@ class Graph:
         )
 
         # populate graph filenames
-        memory_swap_graph_filename['memory'] = os.path.basename(memory_graph_filename)
-        memory_swap_graph_filename['swap'] = os.path.basename(swap_graph_filename)
+        memory_swap_graph_filename["memory"] = os.path.basename(memory_graph_filename)
+        memory_swap_graph_filename["swap"] = os.path.basename(swap_graph_filename)
 
         return memory_swap_graph_filename
 
@@ -556,7 +560,9 @@ class Graph:
         # set up graph attributes
         context_switch_graph_title = "Context Switches States (per second)"
         context_switch_graph_vertical_label = "count/second"
-        context_switch_graph_filename = self.rrd_graph_dir + f"/os-context_switch.{self.uuid}.png"
+        context_switch_graph_filename = (
+            self.rrd_graph_dir + f"/os-context_switch.{self.uuid}.png"
+        )
         context_switch_graph_commands = []
         for metric, meta in context_switch.items():
             color = meta["color"]
@@ -593,10 +599,12 @@ class Graph:
         )
 
         # populate graph filenames
-        os_graph_filename['loadavg'] = os.path.basename(loadavg_graph_filename)
-        os_graph_filename['fd'] = os.path.basename(fd_graph_filename)
-        os_graph_filename['procs'] = os.path.basename(procs_graph_filename)
-        os_graph_filename['context_switch'] = os.path.basename(context_switch_graph_filename)
+        os_graph_filename["loadavg"] = os.path.basename(loadavg_graph_filename)
+        os_graph_filename["fd"] = os.path.basename(fd_graph_filename)
+        os_graph_filename["procs"] = os.path.basename(procs_graph_filename)
+        os_graph_filename["context_switch"] = os.path.basename(
+            context_switch_graph_filename
+        )
 
         return os_graph_filename
 
@@ -613,43 +621,50 @@ class Graph:
                 "rrd_filename": self.rrd_db_dir + "/network-rx_bytes.rrd",
                 "graph_title": "Number of Good Received Bytes (per second)",
                 "graph_vertical_label": "byte/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-rx_bytes.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-rx_bytes.{self.uuid}.png",
             },
             "rx_errors": {
                 "rrd_filename": self.rrd_db_dir + "/network-rx_errors.rrd",
                 "graph_title": "Number of Bad Packets Received (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-rx_errors.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-rx_errors.{self.uuid}.png",
             },
             "rx_dropped": {
                 "rrd_filename": self.rrd_db_dir + "/network-rx_dropped.rrd",
                 "graph_title": "Number of Packets Received But Dropped (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-rx_dropped.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-rx_dropped.{self.uuid}.png",
             },
             "tx_bytes": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_bytes.rrd",
                 "graph_title": "Number of Good Transmitted Bytes (per second)",
                 "graph_vertical_label": "byte/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-tx_bytes.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-tx_bytes.{self.uuid}.png",
             },
             "tx_errors": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_errors.rrd",
                 "graph_title": "Number of Bad Packets Transmitted (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-tx_errors.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-tx_errors.{self.uuid}.png",
             },
             "tx_dropped": {
                 "rrd_filename": self.rrd_db_dir + "/network-tx_dropped.rrd",
                 "graph_title": "Number of Packets Dropped In Transmission (per second)",
                 "graph_vertical_label": "packet/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-tx_dropped.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-tx_dropped.{self.uuid}.png",
             },
             "collisions": {
                 "rrd_filename": self.rrd_db_dir + "/network-collisions.rrd",
                 "graph_title": "Number of Collisions (per second)",
                 "graph_vertical_label": "count/second",
-                "graph_filename": self.rrd_graph_dir + f"/network-collisions.{self.uuid}.png",
+                "graph_filename": self.rrd_graph_dir
+                + f"/network-collisions.{self.uuid}.png",
             },
         }
 
