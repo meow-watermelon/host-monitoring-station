@@ -153,7 +153,7 @@ For more information about start and end keywords please read the [rrdgraph manu
 | OS | num_blocked_procs | count | number of blocked processes (e.g. I/O blocked) |
 | OS | num_zombie_procs | count | number of zombie processes |
 | OS | context_switch | count/second | number of context switches per second |
-| CPU | cpu_freq | kHz | cpu current running frequency |
+| CPU | cpu_freq | kHz | CPU current running frequency |
 | Memory | memory_total | kB | total memory |
 | Memory | memory_free | kB | free memory |
 | Memory | memory_avail | kB | available memory |
