@@ -41,6 +41,7 @@ def hms_load_graphs():
     )
 
     # plot graphs and retrieve graph filename mappings
+    g.cpu_graph_filename = hms_graph.plot_cpu_graph()
     g.disk_graph_filename = hms_graph.plot_disk_graph()
     g.memory_swap_graph_filename = hms_graph.plot_memory_graph()
     g.network_graph_filename = hms_graph.plot_network_graph()
@@ -51,6 +52,7 @@ def hms_load_graphs():
     return render_template(
         "hms.html",
         hostname=g.hostname,
+        cpu_cpu_freq=g.cpu_graph_filename["cpu_freq"],
         disk_read_io=g.disk_graph_filename["read_io"],
         disk_write_io=g.disk_graph_filename["write_io"],
         disk_read_sector=g.disk_graph_filename["read_sector"],

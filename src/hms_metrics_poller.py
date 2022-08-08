@@ -41,6 +41,30 @@ class Metrics:
             f"N:{metrics_values_string}",
         )
 
+    def poll_cpu_metrics(self):
+        """
+        populate CPU stats information and write to CPU RRD databases
+        """
+        # initialize environment variables
+        metrics = [
+            "cpu_freq",
+        ]
+
+        # populate metrics
+        cpu_obj = hms.cpu.CPU()
+        cpus = cpu_obj.cpus
+        cpu = cpu_obj.cpu
+
+        # update RRD databases
+        for metric in metrics:
+            rrd_filename = self.config["RRD_DB_PATH"] + f"/cpu-{metric}.rrd"
+            metric_values = []
+            for cpu_name in cpus:
+                metric_values.append(cpu[metric][cpu_name])
+
+            # update RRD database
+            self._rrd_update(cpus, metric_values, rrd_filename)
+
     def poll_disk_metrics(self):
         """
         populate disk devices stats information and write to disk RRD databases
@@ -178,6 +202,7 @@ if __name__ == "__main__":
     metrics = Metrics(args.config)
 
     # populate memory metrics
+    metrics.poll_cpu_metrics()
     metrics.poll_disk_metrics()
     metrics.poll_memory_metrics()
     metrics.poll_os_metrics()

@@ -30,6 +30,11 @@
         <img src="{{url_for('static', filename='rrd_graph/' + os_context_switch)}}" alt="context_switch">
     </div>
     <hr>
+    <h2 style="text-align:center">CPU Metrics</h2>
+    <div>
+        <img src="{{url_for('static', filename='rrd_graph/' + cpu_cpu_freq)}}" alt="cpu_freq">
+    </div>
+    <hr>
     <h2 style="text-align:center">Memory Metrics</h2>
     <div>
         <img src="{{url_for('static', filename='rrd_graph/' + memory_memory)}}" alt="memory">

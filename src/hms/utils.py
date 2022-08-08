@@ -14,6 +14,14 @@ def get_hostname_fqdn():
     """
     return socket.getfqdn()
 
+
+def get_cpu():
+    """
+    get cpu list
+    """
+    return sorted([os.path.basename(dir) for dir in glob.glob("/sys/devices/system/cpu/cpu[0-9]*")])
+
+
 def get_network_interfaces():
     """
     get network interface list

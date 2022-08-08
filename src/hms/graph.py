@@ -45,6 +45,87 @@ class Graph:
         else:
             return sizes["medium"]
 
+    def plot_cpu_graph(self):
+        """
+        plot CPU RRD graphs
+        """
+        # CPU graph filename mappings
+        cpu_graph_filename = {}
+
+        # set up graph attributes
+        cpu_metric_mappings = {
+            "cpu_freq": {
+                "rrd_filename": self.rrd_db_dir + "/cpu-cpu_freq.rrd",
+                "graph_title": "CPU Running Frequency",
+                "graph_vertical_label": "kHz",
+                "graph_filename": self.rrd_graph_dir + f"/cpu-cpu_freq.{self.uuid}.png",
+            },
+        }
+
+        for metric, graph_meta in cpu_metric_mappings.items():
+            # metric mapping variables
+            rrd_filename = graph_meta["rrd_filename"]
+            graph_title = graph_meta["graph_title"]
+            graph_vertical_label = graph_meta["graph_vertical_label"]
+            graph_filename = graph_meta["graph_filename"]
+
+            # get CPU names
+            cpus = utils.get_rrd_ds(rrd_filename)
+
+            # get color plate list
+            cpu_color_plate = utils.rotate_color_plate(cpus, self.color_plate)
+
+            # plot CPU graphs
+            cpu = collections.OrderedDict()
+            for count in range(len(cpus)):
+                cpu_name = cpus[count]
+                cpu[cpu_name] = {
+                    "color": cpu_color_plate[count],
+                    "legend": cpu_name,
+                    "style": "LINE1",
+                }
+
+            # CPU graph variables
+            cpu_graph_commands = []
+            for cpu_name, meta in cpu.items():
+                color = meta["color"]
+                legend = meta["legend"]
+                style = meta["style"]
+                cpu_graph_commands.append(
+                    f"DEF:{cpu_name}={rrd_filename}:{cpu_name}:LAST"
+                )
+                cpu_graph_commands.append(f"{style}:{cpu_name}{color}:{legend}")
+                cpu_graph_commands.append(f"GPRINT:{cpu_name}:MAX:max\: %10.1lf")
+                cpu_graph_commands.append(f"GPRINT:{cpu_name}:MIN:min\: %10.1lf")
+                cpu_graph_commands.append(
+                    f"GPRINT:{cpu_name}:LAST:last\: %10.1lf \j"
+                )
+
+            # generate graph
+            rrdtool.graph(
+                graph_filename,
+                "-a",
+                self.rrd_graph_format,
+                "--width",
+                str(self.size[0]),
+                "--height",
+                str(self.size[1]),
+                "--end",
+                str(self.end),
+                "--start",
+                str(self.start),
+                "--title",
+                graph_title,
+                "--vertical-label",
+                graph_vertical_label,
+                cpu_graph_commands,
+            )
+
+            # populate graph filenames
+            cpu_graph_filename[metric] = os.path.basename(graph_filename)
+
+        return cpu_graph_filename
+
     def plot_disk_graph(self):
         """
         plot disk RRD graphs

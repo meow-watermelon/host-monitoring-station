@@ -2,6 +2,7 @@
 
 __version__ = "0.0.1"
 
+from . import cpu
 from . import disk
 from . import memory
 from . import network

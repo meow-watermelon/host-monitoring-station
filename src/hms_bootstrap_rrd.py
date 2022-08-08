@@ -20,6 +20,29 @@ class Bootstrap:
         self.rrd_dir = rrd_dir
         self.rrd_step = step
 
+    def bootstrap_cpu(self):
+        """
+        bootstrap CPU stats information RRD databases
+        """
+        metrics = {
+            "cpu_freq": "GAUGE",
+        }
+        cpus = hms.utils.get_cpu()
+
+        for metric, compute in metrics.items():
+            rrd_filename = self.rrd_dir + f"/cpu-{metric}.rrd"
+            rrdtool.create(
+                rrd_filename,
+                "--step",
+                self.rrd_step,
+                [f"DS:{cpu_name}:{compute}:300:0:U" for cpu_name in cpus],
+                "RRA:AVERAGE:0.5:1m:1d",
+                "RRA:AVERAGE:0.5:1h:6M",
+                "RRA:AVERAGE:0.5:1d:1y",
+            )
+
+            print(f"RRD {rrd_filename} created.")
+
     def bootstrap_disk(self):
         """
         bootstrap disk stats information RRD databases
@@ -144,6 +167,7 @@ if __name__ == "__main__":
 
     # create bootstrap object
     bootstrap = Bootstrap(args.dir, args.step)
+    bootstrap.bootstrap_cpu()
     bootstrap.bootstrap_disk()
     bootstrap.bootstrap_os()
     bootstrap.bootstrap_memory()
