@@ -191,7 +191,9 @@ I saved some example screenshots in the `screenshots` directory for reference.
 ## Change Log
 
 * 0.0.1
+
 ** initial commit
 
 * 0.0.2 - 08/07/2022
+
 ** add CPU frequency metric + graph feature
