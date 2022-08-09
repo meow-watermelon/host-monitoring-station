@@ -187,3 +187,11 @@ I saved some example screenshots in the `screenshots` directory for reference.
 * I would add more metrics in the future version but the current metrics are pretty sufficient for my own use. If you have any suggestions on metrics please open a bug to me.
 * Better exception handling. The current version swallowed some exceptions to make the application run smoothly. I may write some customized exception classes in the future version for better debugging purposes.
 * If a new disk device or network interface is added into the host the graph won't display metrics of the newly added devices. Because the current version does not support dynamic data sources adjustment. This feature will be added soon.
+
+## Change Log
+
+* 0.0.1
+** initial commit
+
+* 0.0.2 - 08/07/2022
+** add CPU frequency metric + graph feature
