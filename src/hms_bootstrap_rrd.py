@@ -36,9 +36,7 @@ class Bootstrap:
                 "--step",
                 self.rrd_step,
                 [f"DS:{cpu_name}:{compute}:300:0:U" for cpu_name in cpus],
-                "RRA:AVERAGE:0.5:1m:1d",
-                "RRA:AVERAGE:0.5:1h:6M",
-                "RRA:AVERAGE:0.5:1d:1y",
+                f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
             )
 
             print(f"RRD {rrd_filename} created.")
@@ -65,9 +63,7 @@ class Bootstrap:
                 "--step",
                 self.rrd_step,
                 [f"DS:{disk_device}:{compute}:300:0:U" for disk_device in disk_devices],
-                "RRA:AVERAGE:0.5:1m:1d",
-                "RRA:AVERAGE:0.5:1h:6M",
-                "RRA:AVERAGE:0.5:1d:1y",
+                f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
             )
 
             print(f"RRD {rrd_filename} created.")
@@ -94,9 +90,7 @@ class Bootstrap:
                 "--step",
                 self.rrd_step,
                 [f"DS:{interface}:COUNTER:300:0:U" for interface in interfaces],
-                "RRA:AVERAGE:0.5:1m:1d",
-                "RRA:AVERAGE:0.5:1h:6M",
-                "RRA:AVERAGE:0.5:1d:1y",
+                f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
             )
 
             print(f"RRD {rrd_filename} created.")
@@ -117,9 +111,7 @@ class Bootstrap:
             "DS:cache:GAUGE:300:0:U",
             "DS:swap_total:GAUGE:300:0:U",
             "DS:swap_free:GAUGE:300:0:U",
-            "RRA:AVERAGE:0.5:1m:1d",
-            "RRA:AVERAGE:0.5:1h:6M",
-            "RRA:AVERAGE:0.5:1d:1y",
+            f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
         )
 
         print(f"RRD {rrd_filename} created.")
@@ -142,9 +134,7 @@ class Bootstrap:
             "DS:num_blocked_procs:GAUGE:300:0:U",
             "DS:num_zombie_procs:GAUGE:300:0:U",
             "DS:num_context_switch:COUNTER:300:0:U",
-            "RRA:AVERAGE:0.5:1m:1d",
-            "RRA:AVERAGE:0.5:1h:6M",
-            "RRA:AVERAGE:0.5:1d:1y",
+            f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
         )
 
         print(f"RRD {rrd_filename} created.")

@@ -195,5 +195,8 @@ I saved some example screenshots in the `screenshots` directory for reference.
 * initial commit
 
 0.0.2 - 08/07/2022
-* add CPU frequency metric + graph feature
+* [issue#2] add CPU frequency metric + graph feature
+
+0.0.3 - 08/11/2022
+* [issue#3] use one RRA to store 1 year data metrics
 ```
