@@ -30,6 +30,11 @@ def hms_load_graphs():
     if not size:
         size = "medium"
 
+    # exam start and end time range, set up to default value if not valid
+    if not hms.utils.test_rrd_time_range(start, end):
+        start = "end-8h"
+        end = "now"
+
     # construct graph object
     hms_graph = hms.graph.Graph(
         g.config["RRD_DB_PATH"],

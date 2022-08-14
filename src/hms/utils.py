@@ -62,6 +62,25 @@ def get_rrd_ds(rrd_filename):
     return sorted(ds)
 
 
+def test_rrd_time_range(start, end):
+    """
+    test RRD graph time span range
+    """
+    try:
+        rrdtool.graph(
+            "--start",
+            start,
+            "--end",
+            end,
+        )
+    except rrdtool.OperationalError as e:
+        error_message = str(e)
+        if error_message.startswith("start ") or error_message.startswith("end "):
+            return False
+        else:
+            return True
+
+
 def rotate_color_plate(items, color_plate):
     """
     build color plate list for dynamic generating legends

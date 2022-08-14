@@ -140,6 +140,8 @@ HMS web application supports 3 query parameters:
 
 For more information about start and end keywords please read the [rrdgraph manual](https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html#OPTIONS).
 
+If start and / or end time span range from user input are not valid, HMS will use the default values for start and end parameters.
+
 ## Metrics List
 
 | Category | Metric Name | Unit | Description |
@@ -199,4 +201,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.3 - 08/11/2022
 * [issue#3] use one RRA to store 1 year data metrics
+
+0.0.4 - 08/13/2022
+* [issue#1] fix start / end time span range invalid issue
 ```
