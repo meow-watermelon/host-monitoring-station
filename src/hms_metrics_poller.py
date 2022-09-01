@@ -187,6 +187,44 @@ class Metrics:
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
 
+    def poll_tcp_metrics(self):
+        """
+        populate TCP information and write to TCP RRD databases
+        """
+        # initialize environment variables
+        metrics = [
+            "ESTABLISHED",
+            "SYN_SENT",
+            "SYN_RECV",
+            "FIN_WAIT1",
+            "FIN_WAIT2",
+            "TIME_WAIT",
+            "CLOSE",
+            "CLOSE_WAIT",
+            "LAST_ACK",
+            "LISTEN",
+            "CLOSING",
+            "NEW_SYN_RECV",
+        ]
+
+        # populate metrics
+        tcp = hms.tcp.TCP().tcp
+        tcp_metric_values = []
+        tcp6 = hms.tcp.TCP().tcp6
+        tcp6_metric_values = []
+
+        for metric in metrics:
+            tcp_metric_values.append(tcp[metric])
+            tcp6_metric_values.append(tcp6[metric])
+
+        # update RRD databases
+        self._rrd_update(
+            metrics, tcp_metric_values, self.config["RRD_DB_PATH"] + "/tcp.rrd"
+        )
+        self._rrd_update(
+            metrics, tcp6_metric_values, self.config["RRD_DB_PATH"] + "/tcp6.rrd"
+        )
+
 
 if __name__ == "__main__":
     # set up args
@@ -207,3 +245,4 @@ if __name__ == "__main__":
     metrics.poll_memory_metrics()
     metrics.poll_os_metrics()
     metrics.poll_network_metrics()
+    metrics.poll_tcp_metrics()

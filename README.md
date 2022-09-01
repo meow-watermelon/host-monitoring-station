@@ -35,6 +35,7 @@ All source codes are located under the `src` directory. Please **DO NOT** change
 │   ├── memory.py
 │   ├── network.py
 │   ├── os.py
+│   ├── tcp.py
 │   └── utils.py
 ├── hms_bootstrap_rrd.py
 ├── hms_metrics_poller.py
@@ -177,6 +178,18 @@ If start and / or end time span range from user input are not valid, HMS will us
 | Network | rx_errors | packet/second | number of bad packets received per second |
 | Network | tx_errors | packet/second | number of bad packets transmitted per second |
 | Network | collisions | count/second | number of I/Os in flight per second |
+| IPv4/IPv6 TCP | ESTABLISHED | count | number of ESTABLISHED state sockets |
+| IPv4/IPv6 TCP | SYN_SENT | count | number of SYN_SENT state sockets |
+| IPv4/IPv6 TCP | SYN_RECV | count | number of SYN_RECV state sockets |
+| IPv4/IPv6 TCP | FIN_WAIT1 | count | number of FIN_WAIT1 state sockets |
+| IPv4/IPv6 TCP | FIN_WAIT2 | count | number of FIN_WAIT2 state sockets |
+| IPv4/IPv6 TCP | TIME_WAIT | count | number of TIME_WAIT state sockets |
+| IPv4/IPv6 TCP | CLOSE | count | number of CLOSE state sockets |
+| IPv4/IPv6 TCP | CLOSE_WAIT | count | number of CLOSE_WAIT state sockets |
+| IPv4/IPv6 TCP | LAST_ACK | count | number of LAST_ACK state sockets |
+| IPv4/IPv6 TCP | LISTEN | count | number of LISTEN state sockets |
+| IPv4/IPv6 TCP | CLOSING | count | number of CLOSING state sockets |
+| IPv4/IPv6 TCP | NEW_SYN_RECV | count | number of NEW_SYN_RECV state sockets |
 
 ## Screenshots
 
@@ -204,4 +217,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.4 - 08/13/2022
 * [issue#1] fix start / end time span range invalid issue
+
+0.0.5 - 08/31/2022
+* [issue#6] add TCP metrics
 ```

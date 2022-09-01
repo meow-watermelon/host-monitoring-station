@@ -50,6 +50,7 @@ def hms_load_graphs():
     g.disk_graph_filename = hms_graph.plot_disk_graph()
     g.memory_swap_graph_filename = hms_graph.plot_memory_graph()
     g.network_graph_filename = hms_graph.plot_network_graph()
+    g.tcp_graph_filename = hms_graph.plot_tcp_graph()
     g.os_graph_filename = hms_graph.plot_os_graph()
 
     # render HMS web page
@@ -74,6 +75,8 @@ def hms_load_graphs():
         network_rx_errors=g.network_graph_filename["rx_errors"],
         network_tx_errors=g.network_graph_filename["tx_errors"],
         network_collisions=g.network_graph_filename["collisions"],
+        tcp_tcp=g.tcp_graph_filename["tcp"],
+        tcp_tcp6=g.tcp_graph_filename["tcp6"],
         os_loadavg=g.os_graph_filename["loadavg"],
         os_fd=g.os_graph_filename["fd"],
         os_procs=g.os_graph_filename["procs"],

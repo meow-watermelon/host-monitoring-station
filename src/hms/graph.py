@@ -733,3 +733,99 @@ class Graph:
             network_graph_filename[metric] = os.path.basename(graph_filename)
 
         return network_graph_filename
+
+    def plot_tcp_graph(self):
+        """
+        plot TCP RRD graphs
+        """
+        #  graph filename mappings
+        tcp_graph_filename = {}
+
+        # set up graph attributes
+        tcp_metric_mappings = {
+            "tcp": {
+                "rrd_filename": self.rrd_db_dir + "/tcp.rrd",
+                "graph_title": "IPv4 TCP Connection States (count)",
+                "graph_vertical_label": "count",
+                "graph_filename": self.rrd_graph_dir + f"/tcp.{self.uuid}.png",
+            },
+            "tcp6": {
+                "rrd_filename": self.rrd_db_dir + "/tcp6.rrd",
+                "graph_title": "IPv6 TCP Connection States (count)",
+                "graph_vertical_label": "count",
+                "graph_filename": self.rrd_graph_dir + f"/tcp6.{self.uuid}.png",
+            },
+        }
+
+        for metric, graph_meta in tcp_metric_mappings.items():
+            # metric mapping variables
+            rrd_filename = graph_meta["rrd_filename"]
+            graph_title = graph_meta["graph_title"]
+            graph_vertical_label = graph_meta["graph_vertical_label"]
+            graph_filename = graph_meta["graph_filename"]
+
+            # set up socket states
+            states = [
+                "ESTABLISHED",
+                "SYN_SENT",
+                "SYN_RECV",
+                "FIN_WAIT1",
+                "FIN_WAIT2",
+                "TIME_WAIT",
+                "CLOSE",
+                "CLOSE_WAIT",
+                "LAST_ACK",
+                "LISTEN",
+                "CLOSING",
+                "NEW_SYN_RECV",
+            ]
+
+            # get color plate list
+            state_color_plate = utils.rotate_color_plate(states, self.color_plate)
+
+            # plot TCP graphs
+            tcp = collections.OrderedDict()
+            for count in range(len(states)):
+                state = states[count]
+                tcp[state] = {
+                    "color": state_color_plate[count],
+                    "legend": state,
+                    "style": "LINE1",
+                }
+
+            # TCP graph variables
+            tcp_graph_commands = []
+            for state, meta in tcp.items():
+                color = meta["color"]
+                legend = meta["legend"]
+                style = meta["style"]
+                tcp_graph_commands.append(f"DEF:{state}={rrd_filename}:{state}:LAST")
+                tcp_graph_commands.append(f"{style}:{state}{color}:{legend}")
+                tcp_graph_commands.append(f"GPRINT:{state}:MAX:max\: %8.1lf")
+                tcp_graph_commands.append(f"GPRINT:{state}:MIN:min\: %8.1lf")
+                tcp_graph_commands.append(f"GPRINT:{state}:LAST:last\: %8.1lf \j")
+
+            # generate graph
+            rrdtool.graph(
+                graph_filename,
+                "-a",
+                self.rrd_graph_format,
+                "--width",
+                str(self.size[0]),
+                "--height",
+                str(self.size[1]),
+                "--end",
+                str(self.end),
+                "--start",
+                str(self.start),
+                "--title",
+                graph_title,
+                "--vertical-label",
+                graph_vertical_label,
+                tcp_graph_commands,
+            )
+
+            # populate graph filenames
+            tcp_graph_filename[metric] = os.path.basename(graph_filename)
+
+        return tcp_graph_filename

@@ -139,6 +139,41 @@ class Bootstrap:
 
         print(f"RRD {rrd_filename} created.")
 
+    def bootstrap_tcp(self):
+        """
+        bootstrap TCP information RRD database
+        """
+        rrd_filenames = [
+            self.rrd_dir + "/tcp.rrd",
+            self.rrd_dir + "/tcp6.rrd",
+        ]
+
+        metrics = [
+            "ESTABLISHED",
+            "SYN_SENT",
+            "SYN_RECV",
+            "FIN_WAIT1",
+            "FIN_WAIT2",
+            "TIME_WAIT",
+            "CLOSE",
+            "CLOSE_WAIT",
+            "LAST_ACK",
+            "LISTEN",
+            "CLOSING",
+            "NEW_SYN_RECV",
+        ]
+
+        for rrd_filename in rrd_filenames:
+            rrdtool.create(
+                rrd_filename,
+                "--step",
+                self.rrd_step,
+                [f"DS:{metric}:GAUGE:300:0:U" for metric in metrics],
+                f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
+            )
+
+            print(f"RRD {rrd_filename} created.")
+
 
 if __name__ == "__main__":
     # set up args
@@ -162,3 +197,4 @@ if __name__ == "__main__":
     bootstrap.bootstrap_os()
     bootstrap.bootstrap_memory()
     bootstrap.bootstrap_network()
+    bootstrap.bootstrap_tcp()
