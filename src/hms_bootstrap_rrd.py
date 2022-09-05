@@ -177,6 +177,8 @@ class Bootstrap:
 
 if __name__ == "__main__":
     # set up args
+    components = "os,cpu,memory,disk,network,tcp"
+
     parser = argparse.ArgumentParser(
         description="Host Monitoring Station RRD Database Bootstrap Tool"
     )
@@ -188,13 +190,28 @@ if __name__ == "__main__":
         default="1m",
         help="RRD database step (default: 1m)",
     )
+    parser.add_argument(
+        "--component",
+        type=str,
+        required=False,
+        default=components,
+        help=f"Components to be bootstrapped (default: {components})",
+    )
     args = parser.parse_args()
 
     # create bootstrap object
     bootstrap = Bootstrap(args.dir, args.step)
-    bootstrap.bootstrap_cpu()
-    bootstrap.bootstrap_disk()
-    bootstrap.bootstrap_os()
-    bootstrap.bootstrap_memory()
-    bootstrap.bootstrap_network()
-    bootstrap.bootstrap_tcp()
+
+    for component in args.component.split(","):
+        if component in "os":
+            bootstrap.bootstrap_os()
+        if component in "cpu":
+            bootstrap.bootstrap_cpu()
+        if component in "memory":
+            bootstrap.bootstrap_memory()
+        if component in "disk":
+            bootstrap.bootstrap_disk()
+        if component in "network":
+            bootstrap.bootstrap_network()
+        if component in "tcp":
+            bootstrap.bootstrap_tcp()

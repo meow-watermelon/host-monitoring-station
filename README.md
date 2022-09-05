@@ -93,14 +93,16 @@ $ git clone https://github.com/meow-watermelon/host-monitoring-station.git
 3. Bootstrap RRD databases. Please use `hms_bootstrap_rrd.py` utility to bootstrap the RRD databases. Usage:
 ```
 $ ./hms_bootstrap_rrd.py -h
-usage: hms_bootstrap_rrd.py [-h] --dir DIR [--step STEP]
+usage: hms_bootstrap_rrd.py [-h] --dir DIR [--step STEP] [--component COMPONENT]
 
 Host Monitoring Station RRD Database Bootstrap Tool
 
 options:
-  -h, --help   show this help message and exit
-  --dir DIR    RRD database directory
-  --step STEP  RRD database step (default: 1m)
+  -h, --help            show this help message and exit
+  --dir DIR             RRD database directory
+  --step STEP           RRD database step (default: 1m)
+  --component COMPONENT
+                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp)
 ```
 The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable for a local monitoring system.
 
@@ -220,4 +222,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.5 - 08/31/2022
 * [issue#6] add TCP metrics
+
+0.0.6 - 09/04/2022
+* [issue#4] - allow hms_bootstrap_rrd.py to bootstrap one or more data sources
 ```
