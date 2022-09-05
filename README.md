@@ -225,4 +225,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.6 - 09/04/2022
 * [issue#4] - allow hms_bootstrap_rrd.py to bootstrap one or more data sources
+
+0.0.7 - 09/05/2022
+* [issue#8] - fix inaccurate num_total_procs metric issue
 ```

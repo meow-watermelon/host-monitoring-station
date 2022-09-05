@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import glob
 import subprocess
 
 
@@ -63,6 +64,9 @@ class OS:
             "num_zombie_procs": None,
         }
 
+        # get total number of processes
+        procs["num_total_procs"] = len(glob.glob("/proc/[0-9]*"))
+
         try:
             with open("/proc/stat", "rt") as f:
                 procs_lines = f.readlines()
@@ -70,8 +74,6 @@ class OS:
             pass
         else:
             for line in procs_lines:
-                if line.startswith("processes"):
-                    procs["num_total_procs"] = line.strip().split()[1]
                 if line.startswith("procs_running"):
                     procs["num_running_procs"] = line.strip().split()[1]
                 if line.startswith("procs_blocked"):
