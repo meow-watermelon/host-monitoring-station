@@ -228,4 +228,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.7 - 09/05/2022
 * [issue#8] - fix inaccurate num_total_procs metric issue
+
+0.0.8 - 09/05/22
+* [issue#9] - catch exceptions if updating RRD database is failed
 ```

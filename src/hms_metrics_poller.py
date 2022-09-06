@@ -34,12 +34,19 @@ class Metrics:
                 metrics_values_bucket.append(str(metric))
 
         metrics_values_string = ":".join(metrics_values_bucket)
-        rrdtool.update(
-            rrd_filename,
-            "--template",
-            rrd_ds,
-            f"N:{metrics_values_string}",
-        )
+
+        try:
+            rrdtool.update(
+                rrd_filename,
+                "--template",
+                rrd_ds,
+                f"N:{metrics_values_string}",
+            )
+        except Exception as e:
+            print(
+                f"ERROR: failed to update the RRD database {rrd_filename}: {str(e)}",
+                file=sys.stderr,
+            )
 
     def poll_cpu_metrics(self):
         """
