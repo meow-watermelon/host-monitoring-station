@@ -36,6 +36,7 @@ All source codes are located under the `src` directory. Please **DO NOT** change
 │   ├── network.py
 │   ├── os.py
 │   ├── tcp.py
+│   ├── udp.py
 │   └── utils.py
 ├── hms_bootstrap_rrd.py
 ├── hms_metrics_poller.py
@@ -102,7 +103,7 @@ options:
   --dir DIR             RRD database directory
   --step STEP           RRD database step (default: 1m)
   --component COMPONENT
-                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp)
+                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp,udp)
 ```
 The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable for a local monitoring system.
 
@@ -192,6 +193,10 @@ If start and / or end time span range from user input are not valid, HMS will us
 | IPv4/IPv6 TCP | LISTEN | count | number of LISTEN state sockets |
 | IPv4/IPv6 TCP | CLOSING | count | number of CLOSING state sockets |
 | IPv4/IPv6 TCP | NEW_SYN_RECV | count | number of NEW_SYN_RECV state sockets |
+| UDP | InDatagrams | datagram/second | number of UDP datagrams delivered per second |
+| UDP | OutDatagrams | datagram/second | number of UDP datagrams sent per second |
+| UDP | InErrors | datagram/second | number of received UDP datagrams that could not be delivered per second |
+| UDP | NoPorts | datagram/second | number of received UDP datagrams for which there was no application at the destination port per second |
 
 ## Screenshots
 
@@ -212,16 +217,16 @@ I saved some example screenshots in the `screenshots` directory for reference.
 * initial commit
 
 0.0.2 - 08/07/2022
-* [issue#2] add CPU frequency metric + graph feature
+* [issue#2] - add CPU frequency metric + graph feature
 
 0.0.3 - 08/11/2022
-* [issue#3] use one RRA to store 1 year data metrics
+* [issue#3] - use one RRA to store 1 year data metrics
 
 0.0.4 - 08/13/2022
-* [issue#1] fix start / end time span range invalid issue
+* [issue#1] - fix start / end time span range invalid issue
 
 0.0.5 - 08/31/2022
-* [issue#6] add TCP metrics
+* [issue#6] - add TCP metrics
 
 0.0.6 - 09/04/2022
 * [issue#4] - allow hms_bootstrap_rrd.py to bootstrap one or more data sources
@@ -229,6 +234,9 @@ I saved some example screenshots in the `screenshots` directory for reference.
 0.0.7 - 09/05/2022
 * [issue#8] - fix inaccurate num_total_procs metric issue
 
-0.0.8 - 09/05/22
+0.0.8 - 09/05/2022
 * [issue#9] - catch exceptions if updating RRD database is failed
+
+0.0.9 - 09/08/2022
+* [issue#7] - add UDP metrics
 ```

@@ -829,3 +829,78 @@ class Graph:
             tcp_graph_filename[metric] = os.path.basename(graph_filename)
 
         return tcp_graph_filename
+
+    def plot_udp_graph(self):
+        """
+        plot UDP graphs
+        """
+        # set up RRD DB filename
+        rrd_filename = self.rrd_db_dir + "/udp.rrd"
+
+        #  graph filename mappings
+        udp_graph_filename_dict = {}
+
+        # plot UDP graph
+        udp = collections.OrderedDict()
+        udp = {
+            "InDatagrams": {
+                "color": "#FF0000",
+                "legend": "In Datagrams",
+                "style": "LINE1",
+            },
+            "OutDatagrams": {
+                "color": "#00FF00",
+                "legend": "Out Datagrams",
+                "style": "LINE1",
+            },
+            "InErrors": {
+                "color": "#0000FF",
+                "legend": "In Errors",
+                "style": "LINE1",
+            },
+            "NoPorts": {
+                "color": "#FF00FF",
+                "legend": "No Ports",
+                "style": "LINE1",
+            },
+        }
+
+        # set up graph attributes
+        udp_graph_title = "UDP Datagrams States (per second)"
+        udp_graph_vertical_count = "datagram/second"
+        udp_graph_filename = self.rrd_graph_dir + f"/udp.{self.uuid}.png"
+        udp_graph_commands = []
+        for metric, meta in udp.items():
+            color = meta["color"]
+            legend = meta["legend"]
+            style = meta["style"]
+            udp_graph_commands.append(f"DEF:{metric}={rrd_filename}:{metric}:LAST")
+            udp_graph_commands.append(f"{style}:{metric}{color}:{legend}")
+            udp_graph_commands.append(f"GPRINT:{metric}:MAX:max\: %8.2lf")
+            udp_graph_commands.append(f"GPRINT:{metric}:MIN:min\: %8.2lf")
+            udp_graph_commands.append(f"GPRINT:{metric}:LAST:last\: %8.2lf \j")
+
+        # generate graph
+        rrdtool.graph(
+            udp_graph_filename,
+            "-a",
+            self.rrd_graph_format,
+            "--width",
+            str(self.size[0]),
+            "--height",
+            str(self.size[1]),
+            "--end",
+            str(self.end),
+            "--start",
+            str(self.start),
+            "--title",
+            udp_graph_title,
+            "--vertical-label",
+            udp_graph_vertical_count,
+            udp_graph_commands,
+        )
+
+        # populate graph filenames
+        udp_graph_filename_dict["udp"] = os.path.basename(udp_graph_filename)
+
+        return udp_graph_filename_dict

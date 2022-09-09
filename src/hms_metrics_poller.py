@@ -232,6 +232,29 @@ class Metrics:
             metrics, tcp6_metric_values, self.config["RRD_DB_PATH"] + "/tcp6.rrd"
         )
 
+    def poll_udp_metrics(self):
+        """
+        populate UDP information and write to UDP RRD databases
+        """
+        # initialize environment variables
+        metrics = [
+            "InDatagrams",
+            "OutDatagrams",
+            "InErrors",
+            "NoPorts",
+        ]
+        rrd_filename = self.config["RRD_DB_PATH"] + "/udp.rrd"
+
+        # populate metrics
+        udp = hms.udp.UDP().udp
+        metric_values = []
+
+        for metric in metrics:
+            metric_values.append(udp[metric])
+
+        # update RRD database
+        self._rrd_update(metrics, metric_values, rrd_filename)
+
 
 if __name__ == "__main__":
     # set up args
@@ -253,3 +276,4 @@ if __name__ == "__main__":
     metrics.poll_os_metrics()
     metrics.poll_network_metrics()
     metrics.poll_tcp_metrics()
+    metrics.poll_udp_metrics()
