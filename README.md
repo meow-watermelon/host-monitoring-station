@@ -239,4 +239,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.9 - 09/08/2022
 * [issue#7] - add UDP metrics
+
+0.0.10 - 12/22/2022
+* [issue#10] - fix start and end parameters exception
 ```

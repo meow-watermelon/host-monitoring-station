@@ -75,7 +75,12 @@ def test_rrd_time_range(start, end):
         )
     except rrdtool.OperationalError as e:
         error_message = str(e)
-        if error_message.startswith("start ") or error_message.startswith("end "):
+        if (
+            error_message.startswith("start ")
+            or error_message.startswith("end ")
+            or error_message.startswith("the start ")
+            or error_message.startswith("the end ")
+        ):
             return False
         else:
             return True
