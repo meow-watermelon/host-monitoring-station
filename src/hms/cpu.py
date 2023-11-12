@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import glob
-import os
 from . import utils
 
 
@@ -34,9 +32,6 @@ class CPU:
         metrics = [
             "cpu_freq",
         ]
-        metrics_file_mappings = {
-            "cpu_freq": "/sys/devices/system/cpu/{cpu_name}/cpufreq/scaling_cur_freq",
-        }
 
         for metric in metrics:
             for cpu_name in self.cpus:

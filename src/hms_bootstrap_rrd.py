@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-import glob
 import importlib.util
 import os
-import re
 import rrdtool
 import sys
 
