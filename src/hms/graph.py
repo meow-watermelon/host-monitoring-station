@@ -904,3 +904,63 @@ class Graph:
         udp_graph_filename_dict["udp"] = os.path.basename(udp_graph_filename)
 
         return udp_graph_filename_dict
+
+    def plot_arp_graph(self):
+        """
+        plot ARP graphs
+        """
+        # set up RRD DB filename
+        rrd_filename = self.rrd_db_dir + "/arp.rrd"
+
+        #  graph filename mappings
+        arp_graph_filename_dict = {}
+
+        # plot ARP graph
+        arp = collections.OrderedDict()
+        arp = {
+            "arp_cache_entries": {
+                "color": "#FF0000",
+                "legend": "ARP Cache Entries",
+                "style": "LINE1",
+            },
+        }
+
+        # set up graph attributes
+        arp_graph_title = "ARP Cache Entries (count)"
+        arp_graph_vertical_count = "count"
+        arp_graph_filename = self.rrd_graph_dir + f"/arp.{self.uuid}.png"
+        arp_graph_commands = []
+        for metric, meta in arp.items():
+            color = meta["color"]
+            legend = meta["legend"]
+            style = meta["style"]
+            arp_graph_commands.append(f"DEF:{metric}={rrd_filename}:{metric}:LAST")
+            arp_graph_commands.append(f"{style}:{metric}{color}:{legend}")
+            arp_graph_commands.append(f"GPRINT:{metric}:MAX:max\: %8.2lf")
+            arp_graph_commands.append(f"GPRINT:{metric}:MIN:min\: %8.2lf")
+            arp_graph_commands.append(f"GPRINT:{metric}:LAST:last\: %8.2lf \j")
+
+        # generate graph
+        rrdtool.graph(
+            arp_graph_filename,
+            "-a",
+            self.rrd_graph_format,
+            "--width",
+            str(self.size[0]),
+            "--height",
+            str(self.size[1]),
+            "--end",
+            str(self.end),
+            "--start",
+            str(self.start),
+            "--title",
+            arp_graph_title,
+            "--vertical-label",
+            arp_graph_vertical_count,
+            arp_graph_commands,
+        )
+
+        # populate graph filenames
+        arp_graph_filename_dict["arp"] = os.path.basename(arp_graph_filename)
+
+        return arp_graph_filename_dict

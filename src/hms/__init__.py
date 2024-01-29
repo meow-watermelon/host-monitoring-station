@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-__version__ = "0.0.10"
+__version__ = "0.0.11"
 
+from . import arp
 from . import cpu
 from . import disk
 from . import memory
