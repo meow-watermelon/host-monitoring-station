@@ -28,6 +28,7 @@ All source codes are located under the `src` directory. Please **DO NOT** change
 
 ```
 ├── hms
+│   ├── arp.py
 │   ├── cpu.py
 │   ├── disk.py
 │   ├── graph.py
@@ -103,7 +104,7 @@ options:
   --dir DIR             RRD database directory
   --step STEP           RRD database step (default: 1m)
   --component COMPONENT
-                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp,udp)
+                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp,udp,arp)
 ```
 The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable for a local monitoring system.
 
@@ -197,6 +198,7 @@ If start and / or end time span range from user input are not valid, HMS will us
 | UDP | OutDatagrams | datagram/second | number of UDP datagrams sent per second |
 | UDP | InErrors | datagram/second | number of received UDP datagrams that could not be delivered per second |
 | UDP | NoPorts | datagram/second | number of received UDP datagrams for which there was no application at the destination port per second |
+| ARP | arp_cache_entries | count | number of ARP cache entries |
 
 ## Screenshots
 
@@ -242,4 +244,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.10 - 12/22/2022
 * [issue#10] - fix start and end parameters exception
+
+0.0.11 - 01/28/2024
+* [issue#13] - add ARP cache entries metric
 ```

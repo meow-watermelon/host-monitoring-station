@@ -255,6 +255,26 @@ class Metrics:
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
 
+    def poll_arp_metrics(self):
+        """
+        populate ARP information and write to ARP RRD databases
+        """
+        # initialize environment variables
+        metrics = [
+            "arp_cache_entries",
+        ]
+        rrd_filename = self.config["RRD_DB_PATH"] + "/arp.rrd"
+
+        # populate metrics
+        arp = hms.arp.ARP().arp
+        metric_values = []
+
+        for metric in metrics:
+            metric_values.append(arp[metric])
+
+        # update RRD database
+        self._rrd_update(metrics, metric_values, rrd_filename)
+
 
 if __name__ == "__main__":
     # set up args
@@ -277,3 +297,4 @@ if __name__ == "__main__":
     metrics.poll_network_metrics()
     metrics.poll_tcp_metrics()
     metrics.poll_udp_metrics()
+    metrics.poll_arp_metrics()

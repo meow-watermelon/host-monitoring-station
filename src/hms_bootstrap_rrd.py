@@ -191,10 +191,26 @@ class Bootstrap:
 
         print(f"RRD {rrd_filename} created.")
 
+    def bootstrap_arp(self):
+        """
+        bootstrap ARP information RRD database
+        """
+        rrd_filename = self.rrd_dir + "/arp.rrd"
+
+        rrdtool.create(
+            rrd_filename,
+            "--step",
+            self.rrd_step,
+            "DS:arp_cache_entries:GAUGE:300:0:U",
+            f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
+        )
+
+        print(f"RRD {rrd_filename} created.")
+
 
 if __name__ == "__main__":
     # set up args
-    components = "os,cpu,memory,disk,network,tcp,udp"
+    components = "os,cpu,memory,disk,network,tcp,udp,arp"
 
     parser = argparse.ArgumentParser(
         description="Host Monitoring Station RRD Database Bootstrap Tool"
@@ -234,3 +250,5 @@ if __name__ == "__main__":
             bootstrap.bootstrap_tcp()
         if component in "udp":
             bootstrap.bootstrap_udp()
+        if component in "arp":
+            bootstrap.bootstrap_arp()
