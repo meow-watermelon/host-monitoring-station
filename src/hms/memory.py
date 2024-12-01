@@ -18,6 +18,7 @@ class Memory:
             "cache": None,
             "swap_total": None,
             "swap_free": None,
+            "page_tables": None,
         }
 
         memory_metrics_mapping = {
@@ -28,6 +29,7 @@ class Memory:
             "cache": "Cached",
             "swap_total": "SwapTotal",
             "swap_free": "SwapFree",
+            "page_tables": "PageTables",
         }
 
         try:

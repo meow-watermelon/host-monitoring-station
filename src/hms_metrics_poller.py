@@ -115,6 +115,7 @@ class Metrics:
             "cache",
             "swap_total",
             "swap_free",
+            "page_tables",
         ]
         rrd_filename = self.config["RRD_DB_PATH"] + "/memory.rrd"
 
