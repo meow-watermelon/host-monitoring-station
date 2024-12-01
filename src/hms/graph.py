@@ -285,6 +285,11 @@ class Graph:
                 "legend": "Cache",
                 "style": "LINE1",
             },
+            "page_tables": {
+                "color": "#CE7E00",
+                "legend": "Page Tables",
+                "style": "LINE1",
+            },
         }
 
         # set up graph attributes

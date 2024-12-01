@@ -168,6 +168,7 @@ If start and / or end time span range from user input are not valid, HMS will us
 | Memory | cache | kB | cache |
 | Memory | swap_total | kB | total swap space |
 | Memory | swap_free | kB | free swap space |
+| Memory | page_tables | kB | page tables size |
 | Disk | read_io | count/second | number of read I/Os per second |
 | Disk | write_io | count/second | number of write I/Os per second |
 | Disk | read_merge | count/second | number of read I/Os merged per second |
@@ -247,4 +248,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.11 - 01/28/2024
 * [issue#13] - add ARP cache entries metric
+
+0.0.12 - 12/01/2024
+* [issue#15] - add page tables metric
 ```
