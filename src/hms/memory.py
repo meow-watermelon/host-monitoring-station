@@ -4,6 +4,7 @@
 class Memory:
     def __init__(self):
         self.memory = self._get_memory()
+        self.virtual_memory = self._get_virtual_memory()
 
     def _get_memory(self):
         """
@@ -45,3 +46,37 @@ class Memory:
                         break
 
         return memory
+
+    def _get_virtual_memory(self):
+        """
+        get virtual memory information
+        """
+        virtual_memory = {
+            "minor_page_faults": None,
+            "major_page_faults": None,
+            "total_page_faults": None,
+        }
+
+        virtual_memory_metrics_mapping = {
+            "major_page_faults": "pgmajfault",
+            "total_page_faults": "pgfault",
+        }
+
+        try:
+            with open("/proc/vmstat", "rt") as f:
+                memory_lines = f.readlines()
+        except:
+            pass
+        else:
+            for line in memory_lines:
+                for metric, entry in virtual_memory_metrics_mapping.items():
+                    if line.startswith(entry):
+                        virtual_memory[metric] = line.strip().split()[1]
+                        break
+
+            # calculate minor_page_faults
+            virtual_memory["minor_page_faults"] = int(
+                virtual_memory["total_page_faults"]
+            ) - int(virtual_memory["major_page_faults"])
+
+        return virtual_memory

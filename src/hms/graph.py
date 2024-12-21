@@ -377,9 +377,60 @@ class Graph:
             swap_graph_commands,
         )
 
+        # plot virtual memory graph
+        virtual = collections.OrderedDict()
+        virtual = {
+            "minor_page_faults": {
+                "color": "#FF0000",
+                "legend": "Minor Page Faults",
+                "style": "LINE1",
+            },
+            "major_page_faults": {
+                "color": "#00FF00",
+                "legend": "Major Page Faults",
+                "style": "LINE1",
+            },
+        }
+
+        # set up graph attributes
+        virtual_graph_title = "Page Faults (per second)"
+        virtual_graph_vertical_label = "count/second"
+        virtual_graph_filename = self.rrd_graph_dir + f"/memory-virtual.{self.uuid}.png"
+        virtual_graph_commands = []
+        for metric, meta in virtual.items():
+            color = meta["color"]
+            legend = meta["legend"]
+            style = meta["style"]
+            virtual_graph_commands.append(f"DEF:{metric}={rrd_filename}:{metric}:LAST")
+            virtual_graph_commands.append(f"{style}:{metric}{color}:{legend}")
+            virtual_graph_commands.append(f"GPRINT:{metric}:MAX:max\: %12.1lf")
+            virtual_graph_commands.append(f"GPRINT:{metric}:MIN:min\: %12.1lf")
+            virtual_graph_commands.append(f"GPRINT:{metric}:LAST:last\: %12.1lf \j")
+
+        # generate graph
+        rrdtool.graph(
+            virtual_graph_filename,
+            "-a",
+            self.rrd_graph_format,
+            "--width",
+            str(self.size[0]),
+            "--height",
+            str(self.size[1]),
+            "--end",
+            str(self.end),
+            "--start",
+            str(self.start),
+            "--title",
+            virtual_graph_title,
+            "--vertical-label",
+            virtual_graph_vertical_label,
+            virtual_graph_commands,
+        )
+
         # populate graph filenames
         memory_swap_graph_filename["memory"] = os.path.basename(memory_graph_filename)
         memory_swap_graph_filename["swap"] = os.path.basename(swap_graph_filename)
+        memory_swap_graph_filename["virtual"] = os.path.basename(virtual_graph_filename)
 
         return memory_swap_graph_filename
 

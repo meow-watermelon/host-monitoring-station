@@ -110,6 +110,8 @@ class Bootstrap:
             "DS:swap_total:GAUGE:300:0:U",
             "DS:swap_free:GAUGE:300:0:U",
             "DS:page_tables:GAUGE:300:0:U",
+            "DS:minor_page_faults:COUNTER:300:0:U",
+            "DS:major_page_faults:COUNTER:300:0:U",
             f"RRA:AVERAGE:0.5:{self.rrd_step}:1y",
         )
 

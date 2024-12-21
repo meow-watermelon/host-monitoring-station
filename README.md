@@ -169,6 +169,8 @@ If start and / or end time span range from user input are not valid, HMS will us
 | Memory | swap_total | kB | total swap space |
 | Memory | swap_free | kB | free swap space |
 | Memory | page_tables | kB | page tables size |
+| Memory | minor_page_faults | count/second | number of minor page faults per second |
+| Memory | major_page_faults | count/second | number of major page faults per second |
 | Disk | read_io | count/second | number of read I/Os per second |
 | Disk | write_io | count/second | number of write I/Os per second |
 | Disk | read_merge | count/second | number of read I/Os merged per second |
@@ -251,4 +253,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.12 - 12/01/2024
 * [issue#15] - add page tables metric
+
+0.0.13 - 12/21/2024
+* [issue#17] - add minor + major page faults counts
 ```

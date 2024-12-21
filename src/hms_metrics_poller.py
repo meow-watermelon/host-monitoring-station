@@ -107,7 +107,7 @@ class Metrics:
         populate memory information and write to memory RRD databases
         """
         # initialize environment variables
-        metrics = [
+        memory_metrics = [
             "memory_total",
             "memory_free",
             "memory_avail",
@@ -117,14 +117,23 @@ class Metrics:
             "swap_free",
             "page_tables",
         ]
+        virtual_memory_metrics = [
+            "minor_page_faults",
+            "major_page_faults",
+        ]
+        metrics = memory_metrics + virtual_memory_metrics
+
         rrd_filename = self.config["RRD_DB_PATH"] + "/memory.rrd"
 
         # populate metrics
         memory = hms.memory.Memory().memory
+        virtual_memory = hms.memory.Memory().virtual_memory
         metric_values = []
 
-        for metric in metrics:
+        for metric in memory_metrics:
             metric_values.append(memory[metric])
+        for metric in virtual_memory_metrics:
+            metric_values.append(virtual_memory[metric])
 
         # update RRD database
         self._rrd_update(metrics, metric_values, rrd_filename)
