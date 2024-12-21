@@ -70,6 +70,7 @@ def hms_load_graphs():
         disk_in_flight=g.disk_graph_filename["in_flight"],
         memory_memory=g.memory_swap_graph_filename["memory"],
         memory_swap=g.memory_swap_graph_filename["swap"],
+        memory_virtual=g.memory_swap_graph_filename["virtual"],
         network_rx_bytes=g.network_graph_filename["rx_bytes"],
         network_tx_bytes=g.network_graph_filename["tx_bytes"],
         network_rx_dropped=g.network_graph_filename["rx_dropped"],
