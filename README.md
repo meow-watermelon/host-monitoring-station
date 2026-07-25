@@ -2,7 +2,7 @@
 
 ## Intro
 
-Host Monitoring Station(HMS) is my home-brew standalone monitoring system. This application can collect system metrics and then display graphs in a web page. HMS can ONLY monitor local host system [...]
+Host Monitoring Station(HMS) is my home-brew standalone monitoring system. This application can collect system metrics and then display graphs in a web page. HMS can ONLY monitor local host system metrics, it is NOT a distributed monitoring system. The reason why I built it is to give myself a simple and easy way to grasp system performance across several servers in my home.
 
 HMS is a very lightweight monitoring system and can be running with minimum configuration efforts.
 
@@ -20,7 +20,7 @@ HMS is constructed by the following components:
 
 **System Metrics Poller** is an application to collect system metrics and write the values to local RRDtool TSDB.
 
-**HMS Web Application** is the front-end web application to display RRD graphs. Users can use any WSGI server to run this web application. I shipped a [uWSGI](https://uwsgi-docs.readthedocs.io/en/[...]
+**HMS Web Application** is the front-end web application to display RRD graphs. Users can use any WSGI server to run this web application. I shipped a [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) configuration file that can be running directly if users would like to use uWSGI as the WSGI server.
 
 ## Package Structure
 
@@ -83,7 +83,7 @@ yaml
 
 ## Installation and Configuration
 
-In order to make the installation and configuration easier, I did not create any 3rd-party package. Users can clone the whole repository and configure some parameters to start running HMS. All com[...]
+In order to make the installation and configuration easier, I did not create any 3rd-party package. Users can clone the whole repository and configure some parameters to start running HMS. All commands should be running under `src` directory.
 
 Please follow the instructions below to set up and run HMS:
 
@@ -91,7 +91,7 @@ Please follow the instructions below to set up and run HMS:
 ```
 $ git clone https://github.com/meow-watermelon/host-monitoring-station.git
 ```
-2. Configure the HMS configuration file `src/static/config/hms.yaml`. In this file, please define **RRD_DB_PATH** variable to a proper directory to save RRD databases. Please ignore other variable[...]
+2. Configure the HMS configuration file `src/static/config/hms.yaml`. In this file, please define **RRD_DB_PATH** variable to a proper directory to save RRD databases. Please ignore other variables now as those might be used for future version.
 3. Bootstrap RRD databases. Please use `hms_bootstrap_rrd.py` utility to bootstrap the RRD databases. Usage:
 ```
 $ ./hms_bootstrap_rrd.py -h
@@ -104,9 +104,9 @@ options:
   --dir DIR             RRD database directory
   --step STEP           RRD database step (default: 1m)
   --component COMPONENT
-                         Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp,udp,arp)
+                        Components to be bootstrapped (default: os,cpu,memory,disk,network,tcp,udp,arp)
 ```
-The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable[...]
+The default RRD database step is 1 minute. It s a recommended value in HMS. Please do not change this unless you know what you are doing. Collecting and writing metrics every minute is reasonable for a local monitoring system.
 
 4. Set up the system metrics poller. The poller completes collecting metrics and writing values to RRD databases in a running cycle. Usage:
 ```
@@ -119,19 +119,19 @@ options:
   -h, --help       show this help message and exit
   --config CONFIG  Host Monitoring Station config file
 ```
-The time period between each polling **MUST** match the step defined in the bootstrap step. For example, if the step of RRD databases is 1 minute then the metrics poller must be triggered every m[...]
+The time period between each polling **MUST** match the step defined in the bootstrap step. For example, if the step of RRD databases is 1 minute then the metrics poller must be triggered every minute. Here is an example of how I run the poller in a bash terminal:
 ```
 while true; do ./hms_metrics_poller.py --config static/config/hms.yaml; sleep 60; done
 ```
-5. Set up RRD graphs retention policy. RRD graphs are generated in real-time and will be only used once. So it does not make sense to save all RRD graphs because the graphs are useless once the g[...]
+5. Set up RRD graphs retention policy. RRD graphs are generated in real-time and will be only used once. So it does not make sense to save all RRD graphs because the graphs are useless once the graphs are displayed in HMS web application. Users can simply use cron to trigger the deletion based on the graph files modification time. Here is an example of crontab I use on my laptop:
 ```
 * * * * * find /home/ericlee/Projects/git/host-monitoring-station/src/static/rrd_graph -type f -name '*.png' -mmin +1 -exec rm -rf '{}' \;
 ```
-6. Once the metrics poller is running, the RRD databases will have system metrics stored in the RRD TSDB and can be displayed in the HMS web application. All RRD graphs are in PNG format. The def[...]
+6. Once the metrics poller is running, the RRD databases will have system metrics stored in the RRD TSDB and can be displayed in the HMS web application. All RRD graphs are in PNG format. The default HTTP service port of HMS web application is **4080** and web server stats port is **4081**. Users can adjust those parameters in `hms_web_uwsgi.ini` file. To start the HMS web application please run the following command under `src` directory:
 ```
 $ uwsgi hms_web_uwsgi.ini
 ```
-Once the HMS web application started, users can access the metrics graph via <http://127.0.0.1:4080/hms>. The default graph size is 900 x 300 pixels and display last 8 hours metrics. Users can qu[...]
+Once the HMS web application started, users can access the metrics graph via <http://127.0.0.1:4080/hms>. The default graph size is 900 x 300 pixels and display last 8 hours metrics. Users can query the historical data and display different graph size by using different URL query parameters. This will be covered by following section. 
 
 ## HMS Web Application Query Parameters
 
@@ -212,8 +212,8 @@ I saved some example screenshots in the `screenshots` directory for reference.
 * UI is ugly! I know that and I'm really not a UI/UX expert.
 * No logs so far for all applications. I will add a logging facility in the next version.
 * I would add more metrics in the future version but the current metrics are pretty sufficient for my own use. If you have any suggestions on metrics please open a bug to me.
-* Better exception handling. The current version swallowed some exceptions to make the application run smoothly. I may write some customized exception classes in the future version for better deb[...]
-* If a new disk device or network interface is added into the host the graph won't display metrics of the newly added devices. Because the current version does not support dynamic data sources ad[...]
+* Better exception handling. The current version swallowed some exceptions to make the application run smoothly. I may write some customized exception classes in the future version for better debugging purposes.
+* If a new disk device or network interface is added into the host the graph won't display metrics of the newly added devices. Because the current version does not support dynamic data sources adjustment. This feature will be added soon.
 
 ## Change Log
 
@@ -256,7 +256,4 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.13 - 12/21/2024
 * [issue#17] - add minor + major page faults counts
-
-0.0.14 - 07/25/2026
-* add systemd service daemons - AI generated
 ```
