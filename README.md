@@ -256,4 +256,7 @@ I saved some example screenshots in the `screenshots` directory for reference.
 
 0.0.13 - 12/21/2024
 * [issue#17] - add minor + major page faults counts
+
+0.0.14 - 07/25/2026
+* add systemd service daemons - AI generated
 ```
