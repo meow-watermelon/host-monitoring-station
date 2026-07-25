@@ -1,0 +1,15 @@
+[Unit]
+Description=Host Monitoring Station Web (uWSGI)
+After=network.target
+
+[Service]
+Type=simple
+User=ericlee
+Group=ericlee
+WorkingDirectory=/home/ericlee/host-monitoring-station/src
+ExecStart=/usr/bin/uwsgi --ini /home/ericlee/host-monitoring-station/src/hms_web_uwsgi.ini --logto /home/ericlee/Projects/hms/hms_uwsgi.log
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

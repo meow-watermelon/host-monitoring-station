@@ -1,0 +1,15 @@
+[Unit]
+Description=Host Monitoring Station Web (Gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=ericlee
+Group=ericlee
+WorkingDirectory=/home/ericlee/host-monitoring-station/src
+ExecStart=/usr/bin/gunicorn --workers 2 --bind 0.0.0.0:4080 hms_web:app
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
