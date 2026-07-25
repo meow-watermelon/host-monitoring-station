@@ -292,7 +292,7 @@ if __name__ == "__main__":
         description="Host Monitoring Station Metrics Poller"
     )
     parser.add_argument(
-        "--config", type=str, required=True, help="Host Monitoring Station config file"
+        "--config", type=str, required=False, default="static/config/hms.yaml", help="Host Monitoring Station config file (default: static/config/hms.yaml)"
     )
     args = parser.parse_args()
 

@@ -1,0 +1,14 @@
+[Unit]
+Description=Host Monitoring Station Metrics Poller
+After=network.target
+
+[Service]
+Type=oneshot
+User=ericlee
+Group=ericlee
+WorkingDirectory=/home/ericlee/host-monitoring-station/src
+ExecStart=/usr/bin/env python3 /home/ericlee/host-monitoring-station/src/hms_metrics_poller.py --config static/config/hms.yaml
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
