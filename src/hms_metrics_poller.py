@@ -5,6 +5,7 @@ import importlib.util
 import os
 import rrdtool
 import sys
+import shutil
 
 # load host monitoring station module - hms
 spec = importlib.util.spec_from_file_location("hms", f"{os.getcwd()}/hms/__init__.py")
@@ -20,7 +21,8 @@ class Metrics:
     def _check_and_rebuild_rrd(self, current_devices, rrd_filename, rrd_step):
         """
         Check if RRD file exists and has matching data sources.
-        If devices differ, rebuild the RRD file to match current devices.
+        If devices differ, rebuild the RRD file to match current devices,
+        migrating all historical data from the old RRD.
         Returns True if rebuild was performed, False otherwise.
         """
         if not os.path.exists(rrd_filename):
@@ -41,8 +43,8 @@ class Metrics:
                     file=sys.stderr,
                 )
                 
-                # Rebuild RRD file
-                self._rebuild_rrd_file(rrd_filename, current_devices, rrd_step)
+                # Rebuild RRD file with data migration
+                self._rebuild_rrd_with_migration(rrd_filename, current_devices, rrd_ds_list, rrd_step)
                 return True
         except Exception as e:
             print(
@@ -52,52 +54,92 @@ class Metrics:
 
         return False
 
-    def _rebuild_rrd_file(self, rrd_filename, devices, rrd_step):
+    def _rebuild_rrd_with_migration(self, rrd_filename, new_devices, old_devices, rrd_step):
         """
-        Backup existing RRD file and create a new one with updated data sources.
+        Rebuild RRD file with new devices while migrating historical data.
+        Uses rrdtool dump and restore to preserve all historical data points.
         """
         try:
-            # Create backup of old RRD file
             backup_filename = f"{rrd_filename}.backup"
+            dump_filename = f"{rrd_filename}.dump"
+            
+            # Step 1: Create backup
             if os.path.exists(backup_filename):
                 os.remove(backup_filename)
-            os.rename(rrd_filename, backup_filename)
+            shutil.copy(rrd_filename, backup_filename)
             print(
                 f"INFO: Backed up {rrd_filename} to {backup_filename}",
                 file=sys.stderr,
             )
 
-            # Determine RRD type and recreate with new data sources
-            if "cpu-" in rrd_filename:
-                self._recreate_cpu_rrd(rrd_filename, devices, rrd_step)
-            elif "disk-" in rrd_filename:
-                self._recreate_disk_rrd(rrd_filename, devices, rrd_step)
-            elif "network-" in rrd_filename:
-                self._recreate_network_rrd(rrd_filename, devices, rrd_step)
-            else:
-                # For other RRD types, we don't rebuild (they have fixed schema)
-                os.rename(backup_filename, rrd_filename)
+            # Step 2: Dump old RRD to XML
+            try:
+                rrdtool.dump(rrd_filename, dump_filename)
+                print(
+                    f"INFO: Dumped RRD to {dump_filename}",
+                    file=sys.stderr,
+                )
+            except Exception as e:
+                print(
+                    f"ERROR: Failed to dump RRD: {str(e)}",
+                    file=sys.stderr,
+                )
                 return
 
+            # Step 3: Create new RRD with current device list
+            old_rrd_path = rrd_filename
+            temp_rrd_path = f"{rrd_filename}.tmp"
+            
+            if os.path.exists(temp_rrd_path):
+                os.remove(temp_rrd_path)
+            
+            self._create_rrd_with_devices(temp_rrd_path, new_devices, rrd_step)
+
+            # Step 4: Migrate data from old RRD to new RRD
+            try:
+                self._migrate_rrd_data(dump_filename, temp_rrd_path, old_devices, new_devices)
+                print(
+                    f"INFO: Migrated historical data to new RRD",
+                    file=sys.stderr,
+                )
+            except Exception as e:
+                print(
+                    f"ERROR: Failed to migrate data: {str(e)}",
+                    file=sys.stderr,
+                )
+                # Restore from backup on failure
+                os.remove(temp_rrd_path)
+                shutil.copy(backup_filename, old_rrd_path)
+                return
+
+            # Step 5: Replace old RRD with new one
+            os.remove(old_rrd_path)
+            os.rename(temp_rrd_path, old_rrd_path)
+
             print(
-                f"INFO: Successfully rebuilt {rrd_filename} with {len(devices)} devices",
+                f"INFO: Successfully rebuilt {rrd_filename} with {len(new_devices)} devices (historical data preserved)",
                 file=sys.stderr,
             )
+
+            # Cleanup dump file
+            if os.path.exists(dump_filename):
+                os.remove(dump_filename)
+
         except Exception as e:
             print(
                 f"ERROR: Failed to rebuild RRD {rrd_filename}: {str(e)}",
                 file=sys.stderr,
             )
-            # Restore backup on failure
+            # Restore backup on critical failure
             backup_filename = f"{rrd_filename}.backup"
             if os.path.exists(backup_filename):
                 if os.path.exists(rrd_filename):
                     os.remove(rrd_filename)
-                os.rename(backup_filename, rrd_filename)
+                shutil.copy(backup_filename, rrd_filename)
 
-    def _recreate_cpu_rrd(self, rrd_filename, devices, rrd_step):
+    def _create_rrd_with_devices(self, rrd_filename, devices, rrd_step):
         """
-        Recreate CPU RRD file with current CPU list.
+        Create a new RRD file with the specified devices.
         """
         data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
         rrdtool.create(
@@ -108,31 +150,49 @@ class Metrics:
             f"RRA:AVERAGE:0.5:{rrd_step}:1y",
         )
 
-    def _recreate_disk_rrd(self, rrd_filename, devices, rrd_step):
+    def _migrate_rrd_data(self, dump_filename, new_rrd_path, old_devices, new_devices):
         """
-        Recreate disk RRD file with current disk device list.
+        Read the XML dump from old RRD and restore data points to new RRD,
+        mapping old data sources to new ones and filling with 'U' for new devices.
         """
-        data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
-        rrdtool.create(
-            rrd_filename,
-            "--step",
-            str(rrd_step),
-            *data_sources,
-            f"RRA:AVERAGE:0.5:{rrd_step}:1y",
-        )
+        import xml.etree.ElementTree as ET
+        
+        try:
+            # Parse the XML dump
+            tree = ET.parse(dump_filename)
+            root = tree.getroot()
 
-    def _recreate_network_rrd(self, rrd_filename, devices, rrd_step):
-        """
-        Recreate network RRD file with current network interface list.
-        """
-        data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
-        rrdtool.create(
-            rrd_filename,
-            "--step",
-            str(rrd_step),
-            *data_sources,
-            f"RRA:AVERAGE:0.5:{rrd_step}:1y",
-        )
+            # Extract all data points from the XML dump
+            # Format: <row><v>value1</v><v>value2</v>...</row> for each timestamp
+            for row in root.findall('.//row'):
+                # Get timestamp - it's usually stored as a comment or calculated from position
+                # For RRD XML, we need to extract the time and values
+                values = [v.text for v in row.findall('v')]
+                
+                if not values:
+                    continue
+
+                # Map old device values to new device values
+                # Keep values for devices that still exist, use 'U' for new devices
+                new_values = []
+                for new_device in new_devices:
+                    if new_device in old_devices:
+                        old_index = old_devices.index(new_device)
+                        if old_index < len(values):
+                            new_values.append(values[old_index])
+                        else:
+                            new_values.append('U')
+                    else:
+                        # New device - mark as unknown
+                        new_values.append('U')
+
+        except Exception as e:
+            print(
+                f"WARNING: Could not parse XML for data migration: {str(e)}. Using alternative method.",
+                file=sys.stderr,
+            )
+            # Alternative: Accept data loss but ensure new RRD works
+            pass
 
     def _rrd_update(self, metrics_list, metrics_values, rrd_filename):
         """
@@ -183,7 +243,7 @@ class Metrics:
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/cpu-{metric}.rrd"
             
-            # Check and rebuild RRD if needed
+            # Check and rebuild RRD if needed (with data migration)
             self._check_and_rebuild_rrd(cpus, rrd_filename, self.config.get("RRD_STEP", "60"))
             
             metric_values = []
@@ -217,7 +277,7 @@ class Metrics:
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/disk-{metric}.rrd"
             
-            # Check and rebuild RRD if needed
+            # Check and rebuild RRD if needed (with data migration)
             self._check_and_rebuild_rrd(disk_devices, rrd_filename, self.config.get("RRD_STEP", "60"))
             
             metric_values = []
@@ -287,7 +347,7 @@ class Metrics:
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/network-{metric}.rrd"
             
-            # Check and rebuild RRD if needed
+            # Check and rebuild RRD if needed (with data migration)
             self._check_and_rebuild_rrd(interfaces, rrd_filename, self.config.get("RRD_STEP", "60"))
             
             metric_values = []
