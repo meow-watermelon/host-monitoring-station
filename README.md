@@ -261,5 +261,5 @@ I saved some example screenshots in the `screenshots` directory for reference.
 * add systemd service daemons - AI generated
 
 0.0.15 - 08/20/2026
-* [issue#18] - fix RRD data flow when devices are added/removed with automatic rebuild and historical data preservation - AI generated
+* [issue#5] - fix RRD data flow when devices are added/removed with automatic rebuild and historical data preservation - AI generated
 ```
