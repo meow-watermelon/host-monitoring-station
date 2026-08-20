@@ -17,6 +17,123 @@ class Metrics:
     def __init__(self, config_file):
         self.config = hms.utils.read_config(config_file)
 
+    def _check_and_rebuild_rrd(self, current_devices, rrd_filename, rrd_step):
+        """
+        Check if RRD file exists and has matching data sources.
+        If devices differ, rebuild the RRD file to match current devices.
+        Returns True if rebuild was performed, False otherwise.
+        """
+        if not os.path.exists(rrd_filename):
+            return False
+
+        try:
+            # Get current data sources from RRD
+            rrd_ds_list = hms.utils.get_rrd_ds(rrd_filename)
+            
+            # Compare current devices with RRD data sources
+            if sorted(current_devices) != sorted(rrd_ds_list):
+                print(
+                    f"INFO: Device list mismatch for {rrd_filename}",
+                    file=sys.stderr,
+                )
+                print(
+                    f"INFO: RRD has {rrd_ds_list}, current devices are {current_devices}",
+                    file=sys.stderr,
+                )
+                
+                # Rebuild RRD file
+                self._rebuild_rrd_file(rrd_filename, current_devices, rrd_step)
+                return True
+        except Exception as e:
+            print(
+                f"WARNING: Failed to check RRD {rrd_filename}: {str(e)}",
+                file=sys.stderr,
+            )
+
+        return False
+
+    def _rebuild_rrd_file(self, rrd_filename, devices, rrd_step):
+        """
+        Backup existing RRD file and create a new one with updated data sources.
+        """
+        try:
+            # Create backup of old RRD file
+            backup_filename = f"{rrd_filename}.backup"
+            if os.path.exists(backup_filename):
+                os.remove(backup_filename)
+            os.rename(rrd_filename, backup_filename)
+            print(
+                f"INFO: Backed up {rrd_filename} to {backup_filename}",
+                file=sys.stderr,
+            )
+
+            # Determine RRD type and recreate with new data sources
+            if "cpu-" in rrd_filename:
+                self._recreate_cpu_rrd(rrd_filename, devices, rrd_step)
+            elif "disk-" in rrd_filename:
+                self._recreate_disk_rrd(rrd_filename, devices, rrd_step)
+            elif "network-" in rrd_filename:
+                self._recreate_network_rrd(rrd_filename, devices, rrd_step)
+            else:
+                # For other RRD types, we don't rebuild (they have fixed schema)
+                os.rename(backup_filename, rrd_filename)
+                return
+
+            print(
+                f"INFO: Successfully rebuilt {rrd_filename} with {len(devices)} devices",
+                file=sys.stderr,
+            )
+        except Exception as e:
+            print(
+                f"ERROR: Failed to rebuild RRD {rrd_filename}: {str(e)}",
+                file=sys.stderr,
+            )
+            # Restore backup on failure
+            backup_filename = f"{rrd_filename}.backup"
+            if os.path.exists(backup_filename):
+                if os.path.exists(rrd_filename):
+                    os.remove(rrd_filename)
+                os.rename(backup_filename, rrd_filename)
+
+    def _recreate_cpu_rrd(self, rrd_filename, devices, rrd_step):
+        """
+        Recreate CPU RRD file with current CPU list.
+        """
+        data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
+        rrdtool.create(
+            rrd_filename,
+            "--step",
+            str(rrd_step),
+            *data_sources,
+            f"RRA:AVERAGE:0.5:{rrd_step}:1y",
+        )
+
+    def _recreate_disk_rrd(self, rrd_filename, devices, rrd_step):
+        """
+        Recreate disk RRD file with current disk device list.
+        """
+        data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
+        rrdtool.create(
+            rrd_filename,
+            "--step",
+            str(rrd_step),
+            *data_sources,
+            f"RRA:AVERAGE:0.5:{rrd_step}:1y",
+        )
+
+    def _recreate_network_rrd(self, rrd_filename, devices, rrd_step):
+        """
+        Recreate network RRD file with current network interface list.
+        """
+        data_sources = [f"DS:{device}:GAUGE:300:0:U" for device in devices]
+        rrdtool.create(
+            rrd_filename,
+            "--step",
+            str(rrd_step),
+            *data_sources,
+            f"RRA:AVERAGE:0.5:{rrd_step}:1y",
+        )
+
     def _rrd_update(self, metrics_list, metrics_values, rrd_filename):
         """
         update RRD database wrapper
@@ -65,6 +182,10 @@ class Metrics:
         # update RRD databases
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/cpu-{metric}.rrd"
+            
+            # Check and rebuild RRD if needed
+            self._check_and_rebuild_rrd(cpus, rrd_filename, self.config.get("RRD_STEP", "60"))
+            
             metric_values = []
             for cpu_name in cpus:
                 metric_values.append(cpu[metric][cpu_name])
@@ -95,6 +216,10 @@ class Metrics:
         # update RRD databases
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/disk-{metric}.rrd"
+            
+            # Check and rebuild RRD if needed
+            self._check_and_rebuild_rrd(disk_devices, rrd_filename, self.config.get("RRD_STEP", "60"))
+            
             metric_values = []
             for disk_device in disk_devices:
                 metric_values.append(disk[metric][disk_device])
@@ -161,6 +286,10 @@ class Metrics:
         # update RRD databases
         for metric in metrics:
             rrd_filename = self.config["RRD_DB_PATH"] + f"/network-{metric}.rrd"
+            
+            # Check and rebuild RRD if needed
+            self._check_and_rebuild_rrd(interfaces, rrd_filename, self.config.get("RRD_STEP", "60"))
+            
             metric_values = []
             for interface in interfaces:
                 metric_values.append(network[metric][interface])
